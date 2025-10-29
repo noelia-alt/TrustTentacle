@@ -1,0 +1,65 @@
+{
+  "name": "trust-tentacles",
+  "version": "1.0.0",
+  "description": "🐙 Un tentáculo de confianza contra el fraude digital",
+  "main": "index.js",
+  "scripts": {
+    "install:all": "pnpm install && pnpm -r install",
+    "dev:all": "pnpm -r --parallel run dev",
+    "build:all": "pnpm -r run build",
+    "test:all": "pnpm -r run test",
+    
+    "contracts:compile": "pnpm --filter contracts compile",
+    "contracts:deploy": "pnpm --filter contracts deploy",
+    "contracts:test": "pnpm --filter contracts test",
+    
+    "backend:dev": "pnpm --filter backend dev",
+    "backend:start": "pnpm --filter backend start",
+    "backend:test": "pnpm --filter backend test",
+    
+    "extension:build": "pnpm --filter extension build",
+    "extension:dev": "pnpm --filter extension dev",
+    "extension:test": "pnpm --filter extension test",
+    
+    "web:dev": "pnpm --filter web dev",
+    "web:build": "pnpm --filter web build",
+    "web:test": "pnpm --filter web test",
+    
+    "deploy:testnet": "node scripts/setup-env.js && pnpm contracts:deploy && pnpm extension:build",
+    "deploy:prod": "pnpm contracts:deploy && pnpm web:build && pnpm backend:start",
+    "setup": "node scripts/setup-env.js",
+    "deploy:auto": "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1",
+    
+    "lint": "eslint . --ext .js,.ts,.tsx",
+    "format": "prettier --write .",
+    "clean": "pnpm -r exec rm -rf node_modules dist build",
+    "audit": "pnpm audit --audit-level moderate"
+  },
+  "keywords": [
+    "blockchain",
+    "phishing",
+    "security", 
+    "ai",
+    "chrome-extension",
+    "web3",
+    "fraud-detection"
+  ],
+  "author": "TrustTentacles Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
+  },
+  "workspaces": [
+    "contracts",
+    "backend", 
+    "extension",
+    "web"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

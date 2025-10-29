@@ -1,0 +1,86 @@
+{
+  "manifest_version": 3,
+  "name": "TrustTentacle - Digital Guardian",
+  "version": "1.0.0",
+  "description": "🐙 Your intelligent octopus guardian protecting you from phishing and digital fraud in real-time",
+  
+  "icons": {
+    "16": "icons/icon-16.svg",
+    "32": "icons/icon-32.svg",
+    "48": "icons/icon-48.svg",
+    "128": "icons/icon-128.svg"
+  },
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_start"
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "TrustTentacle - Check this site",
+    "default_icon": {
+      "16": "icons/icon-16.svg",
+      "32": "icons/icon-32.svg"
+    }
+  },
+
+  "permissions": [
+    "activeTab",
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+
+  "host_permissions": [
+    "http://localhost:3001/*",
+    "https://api.trusttentacle.com/*"
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/*",
+        "assets/*",
+        "popup.html"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' http://localhost:3001 https://api.trusttentacle.com;"
+  },
+
+  "homepage_url": "https://github.com/your-username/TrustTentacles",
+
+  "author": "TrustTentacle Team - Octopus Hackathon 2025",
+
+  "short_name": "TrustTentacle",
+
+  "commands": {
+    "check-current-site": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+T",
+        "mac": "Command+Shift+T"
+      },
+      "description": "Check current site with TrustTentacle"
+    },
+    "report-phishing": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+R",
+        "mac": "Command+Shift+R"
+      },
+      "description": "Report current site as phishing"
+    }
+  }
+}

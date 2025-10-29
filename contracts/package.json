@@ -1,0 +1,25 @@
+{
+  "name": "@trust-tentacles/contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for TrustTentacle",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.js --network amoy",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "test": "hardhat test",
+    "coverage": "hardhat coverage",
+    "verify": "hardhat verify --network amoy",
+    "node": "hardhat node",
+    "clean": "hardhat clean",
+    "dev": "hardhat node"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@openzeppelin/contracts": "^4.9.3",
+    "hardhat": "^2.19.0",
+    "dotenv": "^16.3.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^4.9.3"
+  }
+}

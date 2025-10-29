@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrustTentacle - Digital Guardian</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header con el pulpo -->
+    <header class="popup-header">
+      <div class="octopus-container">
+        <img src="icons/octopus-logo.png" alt="TrustTentacle Octopus" class="octopus-logo">
+      </div>
+      <div class="header-text">
+        <h1>TrustTentacle</h1>
+        <p>Digital Guardian</p>
+      </div>
+    </header>
+
+    <!-- Estado actual del sitio -->
+    <section class="site-status">
+      <div class="current-site">
+        <div class="site-icon">🌐</div>
+        <div class="site-info">
+          <div class="site-url" id="currentUrl">Cargando...</div>
+          <div class="site-domain" id="currentDomain">---</div>
+        </div>
+      </div>
+      
+      <div class="status-indicator" id="statusIndicator">
+        <div class="status-icon">⏳</div>
+        <div class="status-text">Verificando...</div>
+        <div class="status-details" id="statusDetails">Los tentáculos están explorando...</div>
+      </div>
+    </section>
+
+    <!-- Tentáculos de verificación -->
+    <section class="tentacles-status">
+      <h3>🐙 Estado de los Tentáculos</h3>
+      <div class="tentacles-grid">
+        <div class="tentacle-item" data-tentacle="blockchain">
+          <div class="tentacle-icon">⛓️</div>
+          <div class="tentacle-name">Blockchain</div>
+          <div class="tentacle-status">⏳</div>
+        </div>
+        <div class="tentacle-item" data-tentacle="community">
+          <div class="tentacle-icon">👥</div>
+          <div class="tentacle-name">Comunidad</div>
+          <div class="tentacle-status">⏳</div>
+        </div>
+        <div class="tentacle-item" data-tentacle="threat">
+          <div class="tentacle-icon">🛡️</div>
+          <div class="tentacle-name">Intel</div>
+          <div class="tentacle-status">⏳</div>
+        </div>
+        <div class="tentacle-item" data-tentacle="ssl">
+          <div class="tentacle-icon">🔒</div>
+          <div class="tentacle-name">SSL</div>
+          <div class="tentacle-status">⏳</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acciones -->
+    <section class="actions">
+      <button class="action-btn primary" id="checkSiteBtn">
+        <span class="btn-icon">🔍</span>
+        Verificar Sitio
+      </button>
+      <button class="action-btn secondary" id="reportPhishingBtn">
+        <span class="btn-icon">🎣</span>
+        Reportar Phishing
+      </button>
+    </section>
+
+    <!-- Información adicional -->
+    <section class="info-panel" id="infoPanel" style="display: none;">
+      <div class="info-header">
+        <h4>Detalles de Verificación</h4>
+        <button class="close-btn" id="closeInfoBtn">×</button>
+      </div>
+      <div class="info-content" id="infoContent">
+        <!-- Contenido dinámico -->
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-number" id="sitesChecked">0</span>
+          <span class="stat-label">Sitios verificados</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="threatsBlocked">0</span>
+          <span class="stat-label">Amenazas bloqueadas</span>
+        </div>
+      </div>
+      <div class="footer-links">
+        <button class="link-btn" id="settingsBtn">⚙️ Configuración</button>
+        <button class="link-btn" id="aboutBtn">ℹ️ Acerca de</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal de configuración -->
+  <div class="modal" id="settingsModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>⚙️ Configuración</h3>
+        <button class="close-btn" id="closeSettingsBtn">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-item">
+          <label class="setting-label">
+            <input type="checkbox" id="autoCheckEnabled" checked>
+            <span class="checkmark"></span>
+            Verificación automática
+          </label>
+          <p class="setting-description">Verificar sitios automáticamente al navegar</p>
+        </div>
+        <div class="setting-item">
+          <label class="setting-label">
+            <input type="checkbox" id="notificationsEnabled" checked>
+            <span class="checkmark"></span>
+            Notificaciones
+          </label>
+          <p class="setting-description">Mostrar alertas de seguridad</p>
+        </div>
+        <div class="setting-item">
+          <label class="setting-label">Nivel de verificación:</label>
+          <select id="checkLevel">
+            <option value="basic">Básico</option>
+            <option value="full">Completo</option>
+          </select>
+          <p class="setting-description">Básico usa menos recursos, Completo es más exhaustivo</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn primary" id="saveSettingsBtn">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de reporte -->
+  <div class="modal" id="reportModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🎣 Reportar Phishing</h3>
+        <button class="close-btn" id="closeReportBtn">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Ayuda a proteger la comunidad reportando este sitio sospechoso:</p>
+        <div class="report-url" id="reportUrl">---</div>
+        <textarea id="reportDescription" placeholder="Describe por qué consideras que este sitio es sospechoso..." rows="4"></textarea>
+        <div class="report-category">
+          <label>Categoría:</label>
+          <select id="reportCategory">
+            <option value="phishing">Phishing</option>
+            <option value="malware">Malware</option>
+            <option value="scam">Estafa</option>
+            <option value="fake_site">Sitio falso</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn secondary" id="cancelReportBtn">Cancelar</button>
+        <button class="action-btn primary" id="submitReportBtn">Enviar Reporte</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

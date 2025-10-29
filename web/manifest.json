@@ -1,0 +1,22 @@
+{
+  "name": "TrustTentacle - Digital Guardian",
+  "short_name": "TrustTentacle",
+  "description": "Tu pulpo guardián contra el phishing y fraude digital. Octopus Hackathon 2025",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#8b5cf6",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
