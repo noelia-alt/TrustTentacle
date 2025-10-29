@@ -1,98 +1,97 @@
 # 🐙 TrustTentacle - Digital Trust Guardian
 
-> Un tentáculo de confianza contra el fraude digital  
-> **Octopus Hackathon 2025 - Proyecto Oficial**
+> A tentacle of trust against digital fraud  
+> **Octopus Hackathon 2025 - Official Project**
 
-TrustTentacle es un sistema de protección antiphishing que combina IA y blockchain para crear un "pulpo guardián" que protege a los usuarios en tiempo real mientras navegan por el océano digital.
+TrustTentacle is an anti-phishing protection system that combines AI and blockchain to create a "guardian octopus" that protects users in real-time while navigating the digital ocean.
 
-**🏆 Diseñado especialmente para el Octopus Hackathon 2025** - donde la inteligencia del pulpo se encuentra con la tecnología blockchain para crear el guardián digital más inteligente del océano.
+**🏆 Specially designed for Octopus Hackathon 2025** - where the intelligence of the octopus meets blockchain technology to create the smartest digital guardian in the ocean.
 
-## 🌊 El Problema
+## 🌊 The Problem
 
-En Argentina, los fraudes digitales como el phishing bancario crecen cada año. Miles de personas pierden dinero sin darse cuenta al hacer clic en sitios falsos o correos engañosos.
+Digital fraud like banking phishing grows every year. Thousands of people lose money without realizing it by clicking on fake sites or deceptive emails.
 
-## 🐙 La Solución
+## 🐙 The Solution
 
-TrustTentacle extiende sus 8 tentáculos para protegerte:
+TrustTentacle extends its 8 tentacles to protect you:
 
-1. **Tentáculo IA**: Detecta phishing con machine learning
-2. **Tentáculo Blockchain**: Verifica dominios oficiales en registro inmutable
-3. **Tentáculo SSL**: Analiza certificados y conexiones seguras
-4. **Tentáculo Intel**: Consulta bases de datos de amenazas
-5. **Tentáculo Comunidad**: Reportes colaborativos de usuarios
-6. **Tentáculo Visual**: Análisis de similitud visual de sitios
-7. **Tentáculo Behavioral**: Detecta patrones sospechosos
-8. **Tentáculo Shield**: Protección en tiempo real
+1. **AI Tentacle**: Detects phishing with machine learning
+2. **Blockchain Tentacle**: Verifies official domains in immutable registry
+3. **SSL Tentacle**: Analyzes certificates and secure connections
+4. **Intel Tentacle**: Queries threat databases
+5. **Community Tentacle**: Collaborative user reports
+6. **Visual Tentacle**: Visual similarity analysis of sites
+7. **Behavioral Tentacle**: Detects suspicious patterns
+8. **Shield Tentacle**: Real-time protection
 
-## 🏗️ Arquitectura
+## 🏗️ Architecture
 
 ```
 TrustTentacles/
 ├── contracts/          # Smart contracts (Solidity)
 ├── backend/            # API server (Node.js/Express)
 ├── extension/          # Chrome extension (MV3)
-├── web/               # Dashboard web (React/Next.js)
-├── ml/                # Machine learning models
-├── docs/              # Documentación
-└── scripts/           # Deployment y utilities
+├── web/               # Web dashboard (React/Vite)
+├── docs/              # Documentation
+└── scripts/           # Deployment and utilities
 ```
 
 ## 🚀 Quick Start
 
-### Prerrequisitos
+### Prerequisites
 
-- **Node.js 18+** - Runtime JavaScript
-- **pnpm** - Package manager (más rápido que npm)
-- **Git** - Control de versiones
-- **MetaMask** - Wallet para interactuar con blockchain
-- **Chrome/Edge** - Para testing de la extensión
+- **Node.js 18+** - JavaScript runtime
+- **pnpm** - Package manager (faster than npm)
+- **Git** - Version control
+- **MetaMask** - Wallet to interact with blockchain
+- **Chrome/Edge** - For extension testing
 
-### Instalación
+### Installation
 
 ```bash
-# Clonar el repositorio
-git clone https://github.com/tu-usuario/TrustTentacles.git
-cd TrustTentacles
+# Clone the repository
+git clone https://github.com/noelia-alt/TrustTentacle.git
+cd TrustTentacle
 
-# Instalar pnpm globalmente si no lo tienes
+# Install pnpm globally if you don't have it
 npm install -g pnpm
 
-# Instalar todas las dependencias
+# Install all dependencies
 pnpm install:all
 ```
 
 ### Development
 
 ```bash
-# Compilar contratos inteligentes
+# Compile smart contracts
 pnpm contracts:compile
 
-# Deploy en testnet Polygon Amoy
+# Deploy on Polygon Amoy testnet
 pnpm contracts:deploy
 
-# Iniciar backend API (puerto 3001)
+# Start backend API (port 3001)
 pnpm backend:dev
 
-# Build extensión para desarrollo
+# Build extension for development
 pnpm extension:dev
 
-# Iniciar dashboard web (cuando esté disponible)
+# Start web dashboard
 pnpm web:dev
 
-# Ejecutar todo en paralelo
+# Run everything in parallel
 pnpm dev:all
 ```
 
 ## 🧪 Testing
 
 ```bash
-# Ejecutar todos los tests
+# Run all tests
 pnpm test:all
 
-# Tests específicos
-pnpm contracts:test    # Tests de contratos
-pnpm backend:test      # Tests de API
-pnpm extension:test    # Tests de extensión
+# Specific tests
+pnpm contracts:test    # Contract tests
+pnpm backend:test      # API tests
+pnpm extension:test    # Extension tests
 ```
 
 ## 📦 Deployment
@@ -100,61 +99,61 @@ pnpm extension:test    # Tests de extensión
 ### Testnet (Polygon Amoy)
 
 ```bash
-# Deploy completo en testnet
+# Complete testnet deployment
 pnpm deploy:testnet
 ```
 
-### Producción
+### Production
 
 ```bash
-# Build y deploy en producción
+# Build and deploy to production
 pnpm deploy:prod
 ```
 
-### Comandos útiles
+### Useful Commands
 
 ```bash
-# Limpiar node_modules y builds
+# Clean node_modules and builds
 pnpm clean
 
-# Auditoría de seguridad
+# Security audit
 pnpm audit
 
-# Formatear código
+# Format code
 pnpm format
 
 # Linting
 pnpm lint
 ```
 
-## 🤝 Contribuir
+## 🤝 Contributing
 
-1. Fork el proyecto
-2. Crea una feature branch (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -am 'Agrega nueva funcionalidad'`)
-4. Push a la branch (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
+5. Open a Pull Request
 
-## 📄 Licencia
+## 📄 License
 
-MIT License - ver [LICENSE](LICENSE) para detalles.
+MIT License - see [LICENSE](LICENSE) for details.
 
-## 🐙 Equipo
+## 🐙 Team
 
-Desarrollado con 🧠 y ☕ para el **Octopus Hackathon 2025** (1 octubre - 31 octubre 2025).
+Developed with 🧠 and ☕ for **Octopus Hackathon 2025** (October 1-31, 2025).
 
 ---
 
 ## 🏆 Octopus Hackathon 2025
 
-**"En el océano digital, solo el pulpo más inteligente puede protegerte"**
+**"In the digital ocean, only the smartest octopus can protect you"**
 
-TrustTentacle representa la evolución natural del concepto de pulpo: una criatura inteligente, adaptable y con múltiples tentáculos que trabajan en paralelo. Cada tentáculo de nuestro sistema tiene una función específica, pero todos trabajan juntos para un objetivo común: **tu seguridad digital**.
+TrustTentacle represents the natural evolution of the octopus concept: an intelligent, adaptable creature with multiple tentacles working in parallel. Each tentacle of our system has a specific function, but all work together for a common goal: **your digital security**.
 
-### ¿Por qué un pulpo?
-- **8 tentáculos = 8 sistemas de protección** trabajando simultáneamente
-- **Inteligencia distribuida**: cada tentáculo puede actuar independientemente
-- **Adaptabilidad**: se ajusta a nuevas amenazas en tiempo real
-- **Supervivencia**: el pulpo es uno de los animales más inteligentes del océano
+### Why an octopus?
+- **8 tentacles = 8 protection systems** working simultaneously
+- **Distributed intelligence**: each tentacle can act independently
+- **Adaptability**: adjusts to new threats in real-time
+- **Survival**: the octopus is one of the most intelligent animals in the ocean
 
-**"Navega seguro en el océano digital"** 🌊🔐
+**"Navigate safely in the digital ocean"** 🌊🔐
