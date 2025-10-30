@@ -24,6 +24,34 @@ chrome.runtime.onInstalled.addListener((details) => {
       theme: 'ocean'
     });
   }
+
+  // Create context menu to check links
+  try {
+    chrome.contextMenus.removeAll(() => {
+      chrome.contextMenus.create({
+        id: 'tt-check-link',
+        title: 'TrustTentacle: Check link',
+        contexts: ['link']
+      });
+      chrome.contextMenus.create({
+        id: 'tt-check-page',
+        title: 'TrustTentacle: Check this page',
+        contexts: ['page']
+      });
+      chrome.contextMenus.create({
+        id: 'tt-report-page',
+        title: 'TrustTentacle: Report this page as phishing',
+        contexts: ['page']
+      });
+      chrome.contextMenus.create({
+        id: 'tt-report-link',
+        title: 'TrustTentacle: Report link as phishing',
+        contexts: ['link']
+      });
+    });
+  } catch (e) {
+    console.warn('Context menu creation failed:', e);
+  }
 });
 
 // Handle tab updates - check URLs automatically
@@ -33,6 +61,68 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (settings.enabled && settings.autoCheck) {
       await checkURL(changeInfo.url, tabId);
     }
+  }
+});
+
+// Handle context menu clicks
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  try {
+    if (info.menuItemId === 'tt-check-link' && info.linkUrl) {
+      const tId = tab?.id;
+      const result = await handleCheckURL(info.linkUrl, tId);
+      // Show a compact notification with verdict
+      chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'icons/icon-48.png',
+        title: 'Link check result',
+        message: `${result.verdict}: ${new URL(info.linkUrl).hostname}`
+      });
+    } else if (info.menuItemId === 'tt-check-page') {
+      const pageUrl = tab?.url;
+      if (!pageUrl) throw new Error('No page URL');
+      const tId = tab?.id;
+      const result = await handleCheckURL(pageUrl, tId);
+      chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'icons/icon-48.png',
+        title: 'Page check result',
+        message: `${result.verdict}: ${new URL(pageUrl).hostname}`
+      });
+    } else if (info.menuItemId === 'tt-report-page') {
+      const pageUrl = tab?.url;
+      if (!pageUrl) throw new Error('No page URL');
+      await handleReportPhishing({
+        url: pageUrl,
+        description: 'Reported via context menu',
+        category: 'phishing',
+        evidence: {
+          reportedVia: 'context_menu',
+          reportedFrom: 'context_menu',
+          timestamp: new Date().toISOString(),
+          pageTitle: tab?.title || ''
+        }
+      });
+    } else if (info.menuItemId === 'tt-report-link' && info.linkUrl) {
+      await handleReportPhishing({
+        url: info.linkUrl,
+        description: 'Reported link via context menu',
+        category: 'phishing',
+        evidence: {
+          reportedVia: 'context_menu',
+          reportedFrom: 'context_menu',
+          timestamp: new Date().toISOString(),
+          pageTitle: tab?.title || ''
+        }
+      });
+    }
+  } catch (err) {
+    console.error('Context menu check failed:', err);
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'icons/icon-48.png',
+      title: 'Check failed',
+      message: 'Could not verify the link.'
+    });
   }
 });
 
@@ -138,6 +228,15 @@ async function handleReportPhishing(reportData) {
       message: 'Thank you for helping protect the community!'
     });
 
+    // Notify any open extension pages (e.g., popup) to show a toast
+    try {
+      chrome.runtime.sendMessage({
+        type: 'REPORT_SUBMITTED',
+        url: reportData.url,
+        source: reportData.evidence?.reportedFrom || 'background'
+      });
+    } catch {}
+
     return result;
   } catch (error) {
     console.error('Report submission failed:', error);
@@ -226,4 +325,3 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 console.log('TrustTentacle background script loaded!');
-

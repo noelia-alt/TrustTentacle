@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+
 export default function Dashboard() {
   const stats = [
     { label: 'Sites Verified', value: '10,234', icon: 'SV', change: '+12%' },
@@ -23,6 +26,28 @@ export default function Dashboard() {
     { name: 'Similarity Analysis', status: 'Active', checks: '987' },
     { name: 'Reputation System', status: 'Active', checks: '1,789' }
   ]
+
+  // Activity series for the chart
+  const [activitySeries, setActivitySeries] = useState([
+    { day: 'Mon', value: 180 },
+    { day: 'Tue', value: 210 },
+    { day: 'Wed', value: 190 },
+    { day: 'Thu', value: 230 },
+    { day: 'Fri', value: 260 },
+    { day: 'Sat', value: 240 },
+    { day: 'Sun', value: 243 }
+  ])
+  const [range, setRange] = useState(7)
+
+  useEffect(() => {
+    fetch(`http://localhost:3001/api/v1/stats/activity?days=${range}`)
+      .then(r => (r.ok ? r.json() : Promise.reject()))
+      .then(data => {
+        if (!data?.series) return
+        const mapped = data.series.map(p => ({ day: p.date.slice(5), value: p.value }))
+        setActivitySeries(mapped)
+      }).catch(() => {})
+  }, [range])
 
   return (
     <div style={{ 
@@ -165,24 +190,39 @@ export default function Dashboard() {
           marginTop: '2rem',
           textAlign: 'center'
         }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-            Protection Activity (Last 7 days)
-          </h2>
-          <div style={{ 
-            height: '200px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            color: '#9ca3af'
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>
+              Protection Activity (Last {range} days)
+            </h2>
             <div>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>ACT</div>
-              <p>Real-time activity chart</p>
+              {[7,14,30].map(d => (
+                <button key={d} onClick={() => setRange(d)} style={{
+                  background: range === d ? '#8b5cf6' : 'transparent',
+                  color: 'white', border: '1px solid rgba(255,255,255,0.3)',
+                  padding: '0.25rem 0.6rem', borderRadius: '6px', marginLeft: '0.4rem', cursor: 'pointer'
+                }}>{d}d</button>
+              ))}
             </div>
+          </div>
+          <div style={{ width: '100%', height: 280 }}>
+            <ResponsiveContainer>
+              <AreaChart data={activitySeries} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="dashColorA" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.15)" />
+                <XAxis dataKey="day" stroke="#cbd5e1" />
+                <YAxis stroke="#cbd5e1" />
+                <Tooltip contentStyle={{ background: 'rgba(17,24,39,0.9)', border: 'none', color: 'white' }} />
+                <Area type="monotone" dataKey="value" stroke="#8b5cf6" fillOpacity={1} fill="url(#dashColorA)" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
     </div>
   )
 }
-

@@ -38,7 +38,8 @@
     "activeTab",
     "storage",
     "alarms",
-    "notifications"
+    "notifications",
+    "contextMenus"
   ],
 
   "host_permissions": [

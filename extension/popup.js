@@ -105,6 +105,33 @@ class TrustTentaclePopup {
     document.getElementById('closeInfoBtn').addEventListener('click', () => this.hideInfoPanel());
     document.getElementById('aboutBtn').addEventListener('click', () => this.showAbout());
 
+    // Open dashboard in new tab
+    const openDash = document.getElementById('openDashboardBtn');
+    if (openDash) {
+      openDash.addEventListener('click', () => {
+        const url = 'http://localhost:5173';
+        chrome.tabs.create({ url });
+      });
+    }
+
+    // Listen for background events to show toasts
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message?.type === 'REPORT_SUBMITTED' && message.source !== 'popup') {
+        let host = '';
+        try { host = new URL(message.url).hostname } catch {}
+        this.showTemporaryMessage(`Report submitted${host ? ': ' + host : ''}`, 2500);
+        // Increment local stats and refresh
+        this.stats.reportsSubmitted = (this.stats.reportsSubmitted || 0) + 1;
+        this.updateStatsUI();
+        const statsBox = document.querySelector('.stats');
+        if (statsBox) {
+          statsBox.classList.remove('stat-bump');
+          void statsBox.offsetWidth;
+          statsBox.classList.add('stat-bump');
+        }
+      }
+    });
+
     document.addEventListener('click', (e) => {
       if (e.target.classList.contains('modal')) {
         this.hideAllModals();
@@ -122,6 +149,8 @@ class TrustTentaclePopup {
         this.verificationResult = result;
         this.updateVerificationUI(result);
         this.updateStats();
+        const host = (() => { try { return new URL(this.currentTab.url).hostname } catch { return '' } })();
+        this.showTemporaryMessage(`Checked: ${result.verdict}${host ? ' — ' + host : ''}`, 2500);
       } else {
         throw new Error(result?.error || 'Verification failed');
       }
@@ -129,6 +158,7 @@ class TrustTentaclePopup {
       console.error('Site check failed:', error);
       this.showVerificationStatus('error', 'Could not verify this site');
       this.animateTentacles('error');
+      this.showTemporaryMessage('Check failed');
     }
   }
 
@@ -363,16 +393,59 @@ class TrustTentaclePopup {
   }
 
   updateStatsUI() {
-    document.getElementById('sitesChecked').textContent = this.stats.urlsChecked || 0;
-    document.getElementById('threatsBlocked').textContent = this.stats.threatsBlocked || 0;
+    const bump = (el) => {
+      if (!el) return;
+      el.classList.remove('stat-bump');
+      void el.offsetWidth; // reflow to restart animation
+      el.classList.add('stat-bump');
+    };
+
+    const scEl = document.getElementById('sitesChecked');
+    const tbEl = document.getElementById('threatsBlocked');
+
+    if (scEl) {
+      const next = String(this.stats.urlsChecked || 0);
+      const prev = scEl.textContent;
+      scEl.textContent = next;
+      if (prev !== next) bump(scEl);
+    }
+    if (tbEl) {
+      const next = String(this.stats.threatsBlocked || 0);
+      const prev = tbEl.textContent;
+      tbEl.textContent = next;
+      if (prev !== next) bump(tbEl);
+    }
   }
 
   async updateStats() {
-    this.stats.urlsChecked = (this.stats.urlsChecked || 0) + 1;
-    if (this.verificationResult && (this.verificationResult.verdict === 'DANGEROUS' || this.verificationResult.verdict === 'SUSPICIOUS')) {
-      this.stats.threatsBlocked = (this.stats.threatsBlocked || 0) + 1;
+    const prevSites = this.stats.urlsChecked || 0;
+    const prevThreats = this.stats.threatsBlocked || 0;
+
+    this.stats.urlsChecked = prevSites + 1;
+    let verdict = this.verificationResult?.verdict;
+    if (verdict === 'DANGEROUS' || verdict === 'SUSPICIOUS') {
+      this.stats.threatsBlocked = prevThreats + 1;
     }
+
     this.updateStatsUI();
+
+    // Flash appropriate color based on event
+    const scEl = document.getElementById('sitesChecked');
+    const tbEl = document.getElementById('threatsBlocked');
+    const flash = (el, cls) => {
+      if (!el) return;
+      el.classList.remove('stat-flash-ok','stat-flash-warn','stat-flash-danger');
+      void el.offsetWidth;
+      el.classList.add(cls);
+      setTimeout(() => el.classList.remove(cls), 600);
+    };
+
+    // Always flash green for a successful site check increment
+    if (this.stats.urlsChecked !== prevSites && scEl) flash(scEl, 'stat-flash-ok');
+
+    if (this.stats.threatsBlocked !== prevThreats && tbEl) {
+      flash(tbEl, verdict === 'DANGEROUS' ? 'stat-flash-danger' : 'stat-flash-warn');
+    }
   }
 
   showAbout() {
@@ -424,4 +497,3 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
-

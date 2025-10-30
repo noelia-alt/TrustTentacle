@@ -64,12 +64,28 @@
 
     <section class="actions">
       <button class="action-btn primary" id="checkSiteBtn">
-        <span class="btn-icon">&gt;</span>
+        <span class="btn-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 17l5-5-5-5v10z"/>
+          </svg>
+        </span>
         Check Site
       </button>
       <button class="action-btn secondary" id="reportPhishingBtn">
-        <span class="btn-icon">!</span>
+        <span class="btn-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 21h22L12 2 1 21zm12-3h-2v2h2v-2zm0-6h-2v5h2v-5z"/>
+          </svg>
+        </span>
         Report Phishing
+      </button>
+      <button class="action-btn" id="openDashboardBtn" title="Open TrustTentacle Dashboard">
+        <span class="btn-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3l8 7h-3v8h-4v-5H11v5H7v-8H4l8-7z"/>
+          </svg>
+        </span>
+        Open Dashboard
       </button>
     </section>
 
@@ -167,4 +183,3 @@
   
 </body>
 </html>
-
