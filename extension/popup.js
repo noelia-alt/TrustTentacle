@@ -21,6 +21,26 @@ class TrustTentaclePopup {
     await this.loadVerificationResult();
 
     console.log('Popup initialized successfully');
+
+    // Health check banner (non-blocking)
+    try {
+      const health = await chrome.runtime.sendMessage({ type: 'GET_HEALTH' });
+      if (!health?.ok) {
+        this.showHealthBanner('Backend offline — using demo heuristics only');
+      }
+    } catch {
+      this.showHealthBanner('Backend offline — using demo heuristics only');
+    }
+  }
+
+  showHealthBanner(text) {
+    try {
+      const container = document.querySelector('.popup-container') || document.body;
+      const bar = document.createElement('div');
+      bar.style.cssText = 'background:#7c2d12;color:#fff;padding:6px 10px;font-size:12px;text-align:center';
+      bar.textContent = text;
+      container.prepend(bar);
+    } catch {}
   }
 
   async getCurrentTab() {

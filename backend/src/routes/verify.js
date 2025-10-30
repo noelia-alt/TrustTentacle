@@ -281,7 +281,7 @@ router.post('/', [
     
     console.log(`Verification completed in ${processingTime}ms - Verdict: ${result.verdict}`);
 
-    try { metrics.record('verify'); }
+    try { metrics.record('verify'); } catch {}
     res.json(result);
 
   } catch (error) {
@@ -322,7 +322,7 @@ router.get('/domain/:domain', async (req, res) => {
       result.entity = entityInfo;
     }
 
-    try { metrics.record('verify'); }
+    try { metrics.record('verify'); } catch {}
     res.json(result);
 
   } catch (error) {

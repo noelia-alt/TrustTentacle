@@ -1,6 +1,18 @@
 // TrustTentacle Background Script - English, cleaned
 
-const API_BASE_URL = 'http://localhost:3001/api/v1';
+let API_BASE_URL_DEFAULT = 'http://localhost:3001/api/v1';
+let apiBaseCache = null;
+
+async function getApiBaseUrl() {
+  try {
+    const cfg = await chrome.storage.sync.get({ apiBaseUrl: null });
+    const base = cfg.apiBaseUrl && cfg.apiBaseUrl.trim().length > 0 ? cfg.apiBaseUrl.trim() : API_BASE_URL_DEFAULT;
+    apiBaseCache = base;
+    return base;
+  } catch {
+    return apiBaseCache || API_BASE_URL_DEFAULT;
+  }
+}
 
 // Initialize extension
 chrome.runtime.onInstalled.addListener((details) => {
@@ -21,7 +33,8 @@ chrome.runtime.onInstalled.addListener((details) => {
       autoCheck: true,
       notifications: true,
       checkLevel: 'basic',
-      theme: 'ocean'
+      theme: 'ocean',
+      apiBaseUrl: API_BASE_URL_DEFAULT
     });
   }
 
@@ -51,6 +64,20 @@ chrome.runtime.onInstalled.addListener((details) => {
     });
   } catch (e) {
     console.warn('Context menu creation failed:', e);
+  }
+});
+
+// Ensure menus also exist after browser restart
+chrome.runtime.onStartup.addListener(() => {
+  try {
+    chrome.contextMenus.removeAll(() => {
+      chrome.contextMenus.create({ id: 'tt-check-link', title: 'TrustTentacle: Check link', contexts: ['link'] });
+      chrome.contextMenus.create({ id: 'tt-check-page', title: 'TrustTentacle: Check this page', contexts: ['page'] });
+      chrome.contextMenus.create({ id: 'tt-report-page', title: 'TrustTentacle: Report this page as phishing', contexts: ['page'] });
+      chrome.contextMenus.create({ id: 'tt-report-link', title: 'TrustTentacle: Report link as phishing', contexts: ['link'] });
+    });
+  } catch (e) {
+    console.warn('Context menu creation onStartup failed:', e);
   }
 });
 
@@ -155,6 +182,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         .then(sendResponse)
         .catch(error => sendResponse({ error: error.message }));
       return true;
+    case 'GET_HEALTH':
+      (async () => {
+        try {
+          const base = await getApiBaseUrl();
+          const root = base.replace(/\/?api.*/i, '');
+          const res = await fetch(`${root.replace(/\/$/, '')}/health`, { method: 'GET' });
+          sendResponse({ ok: res.ok });
+        } catch (e) {
+          sendResponse({ ok: false, error: String(e) });
+        }
+      })();
+      return true;
     case 'GET_SETTINGS':
       getSettings().then(sendResponse);
       return true;
@@ -172,7 +211,8 @@ async function checkURL(url, tabId) {
   try {
     console.log(`Checking URL: ${url}`);
     const settings = await getSettings();
-    const response = await fetch(`${API_BASE_URL}/verify`, {
+    const base = await getApiBaseUrl();
+    const response = await fetch(`${base.replace(/\/$/, '')}/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url, checkLevel: settings.checkLevel || 'basic' })
@@ -213,7 +253,8 @@ async function handleCheckURL(url, tabId) {
 // Handle phishing reports
 async function handleReportPhishing(reportData) {
   try {
-    const response = await fetch(`${API_BASE_URL}/report`, {
+    const base = await getApiBaseUrl();
+    const response = await fetch(`${base.replace(/\/$/, '')}/report`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reportData)
@@ -265,7 +306,8 @@ async function getSettings() {
     autoCheck: true,
     notifications: true,
     checkLevel: 'basic',
-    theme: 'ocean'
+    theme: 'ocean',
+    apiBaseUrl: API_BASE_URL_DEFAULT
   });
   return result;
 }
