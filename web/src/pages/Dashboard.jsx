@@ -1,27 +1,27 @@
 export default function Dashboard() {
   const stats = [
-    { label: "Sites Verified", value: "10,234", icon: "🔍", change: "+12%" },
-    { label: "Threats Blocked", value: "2,547", icon: "🛡️", change: "+8%" },
-    { label: "Users Protected", value: "5,123", icon: "👥", change: "+15%" },
-    { label: "Community Reports", value: "3,289", icon: "📊", change: "+5%" }
+    { label: 'Sites Verified', value: '10,234', icon: 'SV', change: '+12%' },
+    { label: 'Threats Blocked', value: '2,547', icon: 'TB', change: '+8%' },
+    { label: 'Users Protected', value: '5,123', icon: 'UP', change: '+15%' },
+    { label: 'Community Reports', value: '3,289', icon: 'CR', change: '+5%' }
   ]
 
   const recentThreats = [
-    { url: "paypa1-secure.tk", risk: "High", detected: "2 min ago", type: "Typosquatting" },
-    { url: "g00gle-verify.ml", risk: "High", detected: "5 min ago", type: "Brand Impersonation" },
-    { url: "amaz0n-login.ga", risk: "Critical", detected: "8 min ago", type: "Credential Theft" },
-    { url: "secure-bank.cf", risk: "Medium", detected: "12 min ago", type: "Suspicious Keywords" }
+    { url: 'paypa1-secure.tk', risk: 'High', detected: '2 min ago', type: 'Typosquatting' },
+    { url: 'g00gle-verify.ml', risk: 'High', detected: '5 min ago', type: 'Brand Impersonation' },
+    { url: 'amaz0n-login.ga', risk: 'Critical', detected: '8 min ago', type: 'Credential Theft' },
+    { url: 'secure-bank.cf', risk: 'Medium', detected: '12 min ago', type: 'Suspicious Keywords' }
   ]
 
   const tentacles = [
-    { name: "Blockchain Registry", status: "Active", checks: "1,234" },
-    { name: "Community Reports", status: "Active", checks: "892" },
-    { name: "Threat Intelligence", status: "Active", checks: "2,341" },
-    { name: "AI Detection", status: "Active", checks: "3,456" },
-    { name: "SSL Analysis", status: "Active", checks: "1,567" },
-    { name: "Domain Verification", status: "Active", checks: "2,123" },
-    { name: "Similarity Analysis", status: "Active", checks: "987" },
-    { name: "Reputation System", status: "Active", checks: "1,789" }
+    { name: 'Blockchain Registry', status: 'Active', checks: '1,234' },
+    { name: 'Community Reports', status: 'Active', checks: '892' },
+    { name: 'Threat Intelligence', status: 'Active', checks: '2,341' },
+    { name: 'AI Detection', status: 'Active', checks: '3,456' },
+    { name: 'SSL Analysis', status: 'Active', checks: '1,567' },
+    { name: 'Domain Verification', status: 'Active', checks: '2,123' },
+    { name: 'Similarity Analysis', status: 'Active', checks: '987' },
+    { name: 'Reputation System', status: 'Active', checks: '1,789' }
   ]
 
   return (
@@ -32,17 +32,15 @@ export default function Dashboard() {
       padding: '2rem'
     }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-        {/* Header */}
         <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
           <h1 style={{ fontSize: '3rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
             Protection Dashboard
           </h1>
           <p style={{ fontSize: '1.25rem', color: '#d1d5db' }}>
-            Real-time statistics from your guardian octopus 🐙
+            Real-time statistics from your guardian octopus
           </p>
         </div>
 
-        {/* Stats Grid */}
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
@@ -72,10 +70,7 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Two Column Layout */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
-          
-          {/* Recent Threats */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.1)',
             backdropFilter: 'blur(10px)',
@@ -84,7 +79,7 @@ export default function Dashboard() {
             border: '1px solid rgba(255, 255, 255, 0.2)'
           }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-              🚨 Recent Threats
+              Recent Threats
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {recentThreats.map((threat, index) => (
@@ -110,14 +105,13 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>
-                    {threat.type} • {threat.detected}
+                    {threat.type} - {threat.detected}
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Tentacles Status */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.1)',
             backdropFilter: 'blur(10px)',
@@ -126,7 +120,7 @@ export default function Dashboard() {
             border: '1px solid rgba(255, 255, 255, 0.2)'
           }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-              🐙 8 Tentacles Status
+              8 Tentacles Status
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {tentacles.map((tentacle, index) => (
@@ -162,7 +156,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Activity Chart Placeholder */}
         <div style={{
           background: 'rgba(255, 255, 255, 0.1)',
           backdropFilter: 'blur(10px)',
@@ -173,7 +166,7 @@ export default function Dashboard() {
           textAlign: 'center'
         }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-            📈 Protection Activity (Last 7 days)
+            Protection Activity (Last 7 days)
           </h2>
           <div style={{ 
             height: '200px', 
@@ -183,7 +176,7 @@ export default function Dashboard() {
             color: '#9ca3af'
           }}>
             <div>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>ACT</div>
               <p>Real-time activity chart</p>
             </div>
           </div>
@@ -192,3 +185,4 @@ export default function Dashboard() {
     </div>
   )
 }
+

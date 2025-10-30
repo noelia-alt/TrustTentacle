@@ -11,7 +11,9 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+  origin: process.env.CORS_ORIGIN 
+    ? process.env.CORS_ORIGIN.split(',') 
+    : ['http://localhost:3000','http://localhost:5173','http://localhost:5174'],
   credentials: true
 }));
 
@@ -38,6 +40,7 @@ app.use('/api/v1/entities', require('./routes/entities'));
 app.use('/api/v1/domains', require('./routes/domains'));
 app.use('/api/v1/stats', require('./routes/stats'));
 app.use('/api/v1/threats', require('./routes/threats'));
+app.use('/api/v1/blockchain', require('./routes/blockchain'));
 
 // Health check
 app.get('/health', (req, res) => {
@@ -45,7 +48,7 @@ app.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     version: process.env.API_VERSION || 'v1',
-    tentacles: '🐙'
+    tentacles: 'TT'
   });
 });
 
@@ -53,7 +56,7 @@ app.get('/health', (req, res) => {
 app.use('*', (req, res) => {
   res.status(404).json({
     error: 'Endpoint not found',
-    message: 'The tentacles couldn\'t find what you\'re looking for 🐙',
+    message: "The tentacles could not find what you are looking for",
     availableEndpoints: [
       'GET /health',
       'POST /api/v1/verify',
@@ -67,7 +70,7 @@ app.use('*', (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error('🚨 Error:', err);
+  console.error('Error:', err);
   
   res.status(err.status || 500).json({
     error: err.message || 'Internal server error',
@@ -79,14 +82,14 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🐙 TrustTentacle API server running on port ${PORT}`);
-  console.log(`🌊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  console.log(`TrustTentacle API server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
   
   // Initialize blockchain connection
   require('./services/blockchain').initialize()
-    .then(() => console.log('⛓️  Blockchain connection initialized'))
-    .catch(err => console.error('❌ Blockchain initialization failed:', err));
+    .then(() => console.log('Blockchain connection initialized'))
+    .catch(err => console.error('Blockchain initialization failed:', err));
 });
 
 module.exports = app;

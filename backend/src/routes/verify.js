@@ -1,8 +1,9 @@
-const express = require('express');
+﻿const express = require('express');
 const { body, query, validationResult } = require('express-validator');
 const blockchainService = require('../services/blockchain');
 const externalAPIs = require('../services/externalAPIs');
-const aiDetection = require('../services/aiDetection');
+
+const metrics = require('../services/metrics');
 
 const router = express.Router();
 
@@ -27,7 +28,7 @@ router.post('/', [
     const { url, checkLevel = 'basic' } = req.body;
     const startTime = Date.now();
     
-    console.log(`🔍 Verifying URL: ${url} (level: ${checkLevel})`);
+    console.log(`ðŸ” Verifying URL: ${url} (level: ${checkLevel})`);
 
     // Extract domain from URL
     let domain;
@@ -55,7 +56,7 @@ router.post('/', [
 
     // Tentacle 1: Blockchain Domain Registry Check
     try {
-      console.log('🐙 Tentacle 1: Checking blockchain registry...');
+      console.log('ðŸ™ Tentacle 1: Checking blockchain registry...');
       const domainCheck = await blockchainService.isDomainOfficial(domain);
       console.log('Domain check result:', domainCheck);
       
@@ -98,7 +99,7 @@ router.post('/', [
 
     // Tentacle 2: Phishing Reports Check
     try {
-      console.log('🐙 Tentacle 2: Checking phishing reports...');
+      console.log('ðŸ™ Tentacle 2: Checking phishing reports...');
       const phishingCheck = await blockchainService.checkPhishingReports(url);
       
       result.tentacles.phishingReports = {
@@ -129,7 +130,7 @@ router.post('/', [
     // Tentacle 3: External APIs (if full check requested)
     if (checkLevel === 'full') {
       try {
-        console.log('🐙 Tentacle 3: Checking external threat intelligence...');
+        console.log('ðŸ™ Tentacle 3: Checking external threat intelligence...');
         const externalCheck = await externalAPIs.checkURL(url);
         
         result.tentacles.externalAPIs = {
@@ -152,9 +153,9 @@ router.post('/', [
         };
       }
 
-      // Tentacle 4: AI Phishing Detection 🧠
+      // Tentacle 4: AI Phishing Detection ðŸ§ 
       try {
-        console.log('🐙 Tentacle 4: AI phishing detection...');
+        console.log('ðŸ™ Tentacle 4: AI phishing detection...');
         const aiAnalysis = await aiDetection.detectPhishing(url);
         
         result.tentacles.aiDetection = {
@@ -190,7 +191,7 @@ router.post('/', [
 
       // Tentacle 5: SSL/Certificate Analysis
       try {
-        console.log('🐙 Tentacle 5: Analyzing SSL certificate...');
+        console.log('ðŸ™ Tentacle 5: Analyzing SSL certificate...');
         const sslCheck = await externalAPIs.checkSSL(domain);
         
         result.tentacles.ssl = {
@@ -234,12 +235,12 @@ router.post('/', [
     const processingTime = Date.now() - startTime;
     result.processingTimeMs = processingTime;
     
-    console.log(`✅ Verification completed in ${processingTime}ms - Verdict: ${result.verdict}`);
+    console.log(`âœ… Verification completed in ${processingTime}ms - Verdict: ${result.verdict}`);
 
-    res.json(result);
+    try { metrics.record('verify'); metrics.record(erify_); } catch {}\n\n    res.json(result);
 
   } catch (error) {
-    console.error('❌ Verification error:', error);
+    console.error('âŒ Verification error:', error);
     res.status(500).json({
       error: 'Verification failed',
       message: error.message,
@@ -276,10 +277,10 @@ router.get('/domain/:domain', async (req, res) => {
       result.entity = entityInfo;
     }
 
-    res.json(result);
+    try { metrics.record('verify'); metrics.record(erify_); } catch {}\n\n    res.json(result);
 
   } catch (error) {
-    console.error('❌ Domain verification error:', error);
+    console.error('âŒ Domain verification error:', error);
     res.status(500).json({
       error: 'Domain verification failed',
       message: error.message
@@ -338,7 +339,7 @@ router.post('/batch', [
     });
 
   } catch (error) {
-    console.error('❌ Batch verification error:', error);
+    console.error('âŒ Batch verification error:', error);
     res.status(500).json({
       error: 'Batch verification failed',
       message: error.message
@@ -347,3 +348,6 @@ router.post('/batch', [
 });
 
 module.exports = router;
+
+
+

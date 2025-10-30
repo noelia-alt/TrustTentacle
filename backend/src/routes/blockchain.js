@@ -23,7 +23,7 @@ router.get('/verify/:domain', async (req, res) => {
   try {
     const { domain } = req.params;
     const result = await BlockchainService.verifyDomain(domain);
-    res.json(result);
+    res.json({ domain, ...result });
   } catch (error) {
     console.error('Error verificando dominio:', error);
     res.status(500).json({
@@ -72,7 +72,7 @@ router.post('/report', async (req, res) => {
     }
     
     const result = await BlockchainService.reportDomain(domain, reporter);
-    res.json(result);
+    res.json({ domain, ...result });
   } catch (error) {
     console.error('Error reportando dominio:', error);
     res.status(500).json({
@@ -104,7 +104,7 @@ router.get('/tx/:txHash', async (req, res) => {
   try {
     const { txHash } = req.params;
     const result = await BlockchainService.getTransactionStatus(txHash);
-    res.json(result);
+    res.json({ domain, ...result });
   } catch (error) {
     console.error('Error obteniendo estado de transacción:', error);
     res.status(500).json({
@@ -171,3 +171,4 @@ router.get('/health', async (req, res) => {
 });
 
 module.exports = router;
+

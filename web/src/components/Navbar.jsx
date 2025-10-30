@@ -46,7 +46,7 @@ export default function Navbar({ onNavigate }) {
                 cursor: 'pointer'
               }}
             >
-              📊 Dashboard
+              Dashboard
             </button>
             <button 
               onClick={() => onNavigate('map')}
@@ -58,7 +58,7 @@ export default function Navbar({ onNavigate }) {
                 cursor: 'pointer'
               }}
             >
-              🌍 Map
+              Map
             </button>
             <button 
               onClick={() => onNavigate('helper')}
@@ -70,7 +70,7 @@ export default function Navbar({ onNavigate }) {
                 cursor: 'pointer'
               }}
             >
-              🧠 Assistant
+              Assistant
             </button>
             <button 
               onClick={() => onNavigate('simulator')}
@@ -82,7 +82,7 @@ export default function Navbar({ onNavigate }) {
                 cursor: 'pointer'
               }}
             >
-              🎮 Simulator
+              Simulator
             </button>
             <button 
               onClick={() => onNavigate('home')}
@@ -96,7 +96,7 @@ export default function Navbar({ onNavigate }) {
                 cursor: 'pointer'
               }}
             >
-              🏠 Home
+              Home
             </button>
           </div>
         </div>
@@ -104,3 +104,4 @@ export default function Navbar({ onNavigate }) {
     </nav>
   )
 }
+

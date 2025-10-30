@@ -1,9 +1,8 @@
 /**
- * Mock del servicio de blockchain para la demo del hackathon
- * Simula la interacción con un contrato inteligente real
+ * Mock blockchain service for demo/testing
  */
 
-// Datos de demostración
+// Demo in-memory domain data
 const mockDomains = {
   'paypal.com': {
     isSafe: true,
@@ -42,69 +41,47 @@ const mockDomains = {
   }
 };
 
-// Simular transacciones pendientes
+// Pending tx store
 const pendingTransactions = [];
 
-// Mock del servicio de blockchain
+const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+
 const BlockchainService = {
-  /**
-   * Verifica si un dominio es seguro
-   * @param {string} domain - Dominio a verificar
-   * @returns {Promise<Object>} Resultado de la verificación
-   */
   async verifyDomain(domain) {
-    console.log(`🔍 Verificando dominio en blockchain: ${domain}`);
-    
-    // Simular tiempo de red
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const normalizedDomain = domain.toLowerCase().trim();
-    const domainInfo = mockDomains[normalizedDomain];
-    
-    if (domainInfo) {
+    await delay(300);
+    const normalized = String(domain).toLowerCase().trim();
+    const info = mockDomains[normalized];
+    if (info) {
       return {
         success: true,
-        isSafe: domainInfo.isSafe,
-        reports: domainInfo.reports,
-        verified: domainInfo.verified,
-        verifiedAt: domainInfo.verifiedAt,
-        verifiedBy: domainInfo.verifiedBy,
-        message: domainInfo.isSafe ? 'Dominio verificado como seguro' : '¡Cuidado! Dominio reportado como malicioso',
-        source: 'blockchain',
+        isSafe: info.isSafe,
+        reports: info.reports,
+        verified: info.verified,
+        verifiedAt: info.verifiedAt,
+        verifiedBy: info.verifiedBy,
+        message: info.isSafe ? 'Dominio verificado como seguro' : 'Cuidado: dominio reportado',
+        source: 'mock',
         isMock: true
       };
     }
-    
-    // Si el dominio no está en la blockchain, asumir que es seguro (por ahora)
     return {
       success: true,
       isSafe: true,
       reports: 0,
       verified: false,
-      message: 'Dominio no encontrado en la blockchain',
-      source: 'blockchain',
+      message: 'Dominio no encontrado en la blockchain (mock)',
+      source: 'mock',
       isMock: true
     };
   },
-  
-  /**
-   * Reporta un dominio como malicioso
-   * @param {string} domain - Dominio a reportar
-   * @param {string} reporter - Dirección del reportero
-   * @returns {Promise<Object>} Resultado del reporte
-   */
+
   async reportDomain(domain, reporter = '0x0000000000000000000000000000000000000000') {
-    console.log(`⚠️ Reportando dominio: ${domain}`);
-    
-    // Simular tiempo de transacción
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const normalizedDomain = domain.toLowerCase().trim();
-    const txHash = `0x${Math.random().toString(16).substr(2, 64)}`;
-    
-    // Crear o actualizar el dominio
-    if (!mockDomains[normalizedDomain]) {
-      mockDomains[normalizedDomain] = {
+    await delay(500);
+    const normalized = String(domain).toLowerCase().trim();
+    const txHash = `0x${Math.random().toString(16).substring(2).padEnd(64, '0')}`;
+
+    if (!mockDomains[normalized]) {
+      mockDomains[normalized] = {
         isSafe: false,
         reports: 1,
         verified: false,
@@ -113,101 +90,54 @@ const BlockchainService = {
         reportedBy: [reporter]
       };
     } else {
-      mockDomains[normalizedDomain].reports += 1;
-      mockDomains[normalizedDomain].lastReportedAt = new Date();
-      if (!mockDomains[normalizedDomain].reportedBy) {
-        mockDomains[normalizedDomain].reportedBy = [reporter];
-      } else if (!mockDomains[normalizedDomain].reportedBy.includes(reporter)) {
-        mockDomains[normalizedDomain].reportedBy.push(reporter);
-      }
+      mockDomains[normalized].reports = (mockDomains[normalized].reports || 0) + 1;
+      mockDomains[normalized].lastReportedAt = new Date();
+      mockDomains[normalized].reportedBy = Array.from(new Set([...(mockDomains[normalized].reportedBy || []), reporter]));
     }
-    
-    // Simular transacción pendiente
-    const tx = {
-      hash: txHash,
-      status: 'pending',
-      domain: normalizedDomain,
-      from: reporter,
-      timestamp: new Date(),
-      confirmations: 0
-    };
-    
+
+    const tx = { hash: txHash, status: 'pending', domain: normalized, from: reporter, timestamp: new Date(), confirmations: 0 };
     pendingTransactions.push(tx);
-    
-    // Simular confirmación después de 5 segundos
+
     setTimeout(() => {
-      const txIndex = pendingTransactions.findIndex(t => t.hash === txHash);
-      if (txIndex > -1) {
-        pendingTransactions[txIndex].status = 'confirmed';
-        pendingTransactions[txIndex].confirmations = 12;
-        console.log(`✅ Transacción confirmada: ${txHash}`);
+      const idx = pendingTransactions.findIndex((t) => t.hash === txHash);
+      if (idx > -1) {
+        pendingTransactions[idx].status = 'confirmed';
+        pendingTransactions[idx].confirmations = 12;
       }
     }, 5000);
-    
+
     return {
       success: true,
       transactionHash: txHash,
-      message: 'Reporte enviado a la blockchain. Esperando confirmaciones...',
-      isMock: true
+      message: 'Reporte enviado (mock). Esperando confirmaciones...'
     };
   },
-  
-  /**
-   * Obtiene el estado de una transacción
-   * @param {string} txHash - Hash de la transacción
-   * @returns {Promise<Object>} Estado de la transacción
-   */
+
   async getTransactionStatus(txHash) {
-    // Simular tiempo de red
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const tx = pendingTransactions.find(t => t.hash === txHash);
-    
-    if (!tx) {
-      return {
-        success: false,
-        error: 'Transacción no encontrada',
-        isMock: true
-      };
-    }
-    
-    return {
-      success: true,
-      ...tx,
-      isMock: true
-    };
+    await delay(200);
+    const tx = pendingTransactions.find((t) => t.hash === txHash);
+    if (!tx) return { success: false, error: 'Transaccion no encontrada', isMock: true };
+    return { success: true, ...tx, isMock: true };
   },
-  
-  /**
-   * Obtiene estadísticas de la blockchain
-   * @returns {Promise<Object>} Estadísticas
-   */
+
   async getStats() {
-    // Simular tiempo de red
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
+    await delay(150);
     const domains = Object.entries(mockDomains);
-    const maliciousDomains = domains.filter(([_, info]) => !info.isSafe);
-    const safeDomains = domains.filter(([_, info]) => info.isSafe);
-    
+    const malicious = domains.filter(([, info]) => !info.isSafe);
+    const safe = domains.filter(([, info]) => info.isSafe);
     return {
       success: true,
       totalDomains: domains.length,
-      maliciousDomains: maliciousDomains.length,
-      safeDomains: safeDomains.length,
-      totalReports: maliciousDomains.reduce((sum, [_, info]) => sum + (info.reports || 0), 0),
+      maliciousDomains: malicious.length,
+      safeDomains: safe.length,
+      totalReports: malicious.reduce((sum, [, info]) => sum + (info.reports || 0), 0),
       lastUpdated: new Date(),
       isMock: true
     };
   },
-  
-  /**
-   * Verifica si el servicio está activo
-   * @returns {Promise<boolean>} true si está activo
-   */
-  async isActive() {
-    return true;
-  }
+
+  async isActive() { return true; }
 };
 
 module.exports = BlockchainService;
+
