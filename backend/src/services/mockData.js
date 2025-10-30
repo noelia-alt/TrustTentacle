@@ -72,6 +72,12 @@ const suspiciousTLDs = [
   '.xyz', '.top', '.click', '.link',   // Often abused
 ];
 
+// String-based indicators to avoid regex ReDoS
+const suspiciousIndicators = [
+  'paypa1', 'g00gle', 'amaz0n', 'micros0ft', 'faceb00k', 'netf1ix',
+  '-secure.', '-verify.', '-login.', '-account.', '-banking.', '-update.'
+];
+
 function getDomainInfo(domain) {
   // Normalize domain
   const normalizedDomain = domain.toLowerCase().replace(/^www\./, '');
@@ -87,14 +93,14 @@ function getDomainInfo(domain) {
     };
   }
   
-  // Check for suspicious patterns
-  for (const pattern of suspiciousPatterns) {
-    if (pattern.test(normalizedDomain)) {
+  // Check for suspicious indicators (no regex)
+  for (const token of suspiciousIndicators) {
+    if (normalizedDomain.includes(token)) {
       return {
         found: true,
         verified: false,
         suspicious: true,
-        reason: 'Domain matches known phishing pattern',
+        reason: 'Domain matches known phishing indicator',
         confidence: 0,
         source: 'pattern_detection'
       };
@@ -155,6 +161,7 @@ module.exports = {
   getAllVerifiedDomains,
   searchEntities,
   verifiedDomains,
+  suspiciousIndicators,
   suspiciousPatterns,
   suspiciousTLDs
 };

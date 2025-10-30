@@ -64,41 +64,88 @@ class ExternalAPIsService {
       throw new Error('VirusTotal API key not configured');
     }
 
-    // Create URL ID for VirusTotal
-    const urlId = Buffer.from(url).toString('base64').replace(/=/g, '');
-    
+    // Strictly validate URL to http(s) and clamp size
+    let safeUrl;
     try {
-      const response = await axios.get(`https://www.virustotal.com/api/v3/urls/${urlId}`, {
-        headers: {
-          'x-apikey': this.virusTotalApiKey
-        },
-        timeout: 10000
-      });
+      const u = new URL(url);
+      if (!/^https?:$/.test(u.protocol)) {
+        throw new Error('Only http(s) URLs are allowed');
+      }
+      if (!u.hostname || u.hostname.length > 255) {
+        throw new Error('Invalid hostname');
+      }
+      // Rebuild a normalized URL without username/password
+      u.username = '';
+      u.password = '';
+      safeUrl = u.toString();
+      if (safeUrl.length > 2048) {
+        safeUrl = safeUrl.slice(0, 2048);
+      }
+    } catch (e) {
+      throw new Error('Invalid URL for VirusTotal');
+    }
 
-      const data = response.data.data.attributes;
-      const stats = data.last_analysis_stats;
+    // Use VT submit+analysis flow to avoid placing user input in path
+    try {
+      const submit = await axios.post(
+        'https://www.virustotal.com/api/v3/urls',
+        `url=${encodeURIComponent(safeUrl)}`,
+        {
+          headers: {
+            'x-apikey': this.virusTotalApiKey,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          timeout: 10000
+        }
+      );
 
-      return {
-        malicious: stats.malicious || 0,
-        suspicious: stats.suspicious || 0,
-        clean: stats.harmless || 0,
-        total: Object.values(stats).reduce((a, b) => a + b, 0),
-        lastAnalysis: data.last_analysis_date,
-        reputation: data.reputation || 0
-      };
-    } catch (error) {
-      if (error.response?.status === 404) {
-        // URL not found in VirusTotal, submit for analysis
-        await this.submitToVirusTotal(url);
+      const analysisId = submit?.data?.data?.id;
+      if (!analysisId) {
+        return { malicious: 0, suspicious: 0, clean: 0, total: 0, status: 'submitted' };
+      }
+
+      // Fetch analysis by server-provided id (no user input in path)
+      const analysis = await axios.get(
+        `https://www.virustotal.com/api/v3/analyses/${encodeURIComponent(analysisId)}`,
+        {
+          headers: { 'x-apikey': this.virusTotalApiKey },
+          timeout: 10000,
+          validateStatus: () => true
+        }
+      );
+
+      if (analysis.status === 200) {
+        const attrs = analysis.data?.data?.attributes || {};
+        const stats = attrs.last_analysis_stats || {};
         return {
-          malicious: 0,
-          suspicious: 0,
-          clean: 0,
-          total: 0,
-          status: 'submitted_for_analysis'
+          malicious: stats.malicious || 0,
+          suspicious: stats.suspicious || 0,
+          clean: stats.harmless || 0,
+          total: Object.values(stats).reduce((a, b) => a + b, 0),
+          lastAnalysis: attrs.date || attrs.last_analysis_date,
+          reputation: attrs.reputation || 0,
+          status: attrs.status || 'completed'
         };
       }
-      throw error;
+
+      // If still queued or non-200, report submission status
+      return {
+        malicious: 0,
+        suspicious: 0,
+        clean: 0,
+        total: 0,
+        status: 'queued'
+      };
+    } catch (error) {
+      // Fall back to fire-and-forget submit
+      try { await this.submitToVirusTotal(safeUrl); } catch {}
+      return {
+        malicious: 0,
+        suspicious: 0,
+        clean: 0,
+        total: 0,
+        status: 'submitted_for_analysis'
+      };
     }
   }
 
@@ -190,6 +237,15 @@ class ExternalAPIsService {
       // Anti-SSRF validation
       const urlObj = new URL(`https://${domain}`);
       const hostname = urlObj.hostname.toLowerCase();
+      const validHostname = /^([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(hostname);
+      // Reject raw IP literals
+      const isIPv4 = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+      const isIPv6 = /:/.test(hostname);
+      if (!validHostname || isIPv4 || isIPv6) {
+        results.issues.push('Invalid host');
+        results.hasIssues = true;
+        return results;
+      }
       if (['localhost', '127.0.0.1', '::1'].includes(hostname)) {
         results.issues.push('Refused to check local address');
         results.hasIssues = true;
@@ -216,11 +272,11 @@ class ExternalAPIsService {
         return results;
       }
 
-      // HEAD request with tight limits
+      // HEAD request with tight limits and no redirects
       try {
         const response = await axios.head(`https://${hostname}`, {
           timeout: 6000,
-          maxRedirects: 3,
+          maxRedirects: 0,
           validateStatus: () => true
         });
         results.hasSSL = true;
