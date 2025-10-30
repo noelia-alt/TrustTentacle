@@ -187,32 +187,48 @@ class ExternalAPIsService {
         issues: []
       };
 
-      // Simple HTTPS check
-      try {
-        const response = await axios.get(`https://${domain}`, {
-          timeout: 10000,
-          maxRedirects: 5,
-          validateStatus: () => true // Accept any status code
-        });
+      // Anti-SSRF validation
+      const urlObj = new URL(`https://${domain}`);
+      const hostname = urlObj.hostname.toLowerCase();
+      if (['localhost', '127.0.0.1', '::1'].includes(hostname)) {
+        results.issues.push('Refused to check local address');
+        results.hasIssues = true;
+        return results;
+      }
 
+      const dns = require('node:dns').promises;
+      try {
+        const addrs = await dns.lookup(hostname, { all: true, verbatim: true });
+        const isPrivate = (ip) => {
+          if (/^(10\.|127\.|172\.(1[6-9]|2\d|3[0-1])\.|192\.168\.)/.test(ip)) return true;
+          if (/^169\.254\./.test(ip)) return true;
+          if (ip === '::1' || ip.startsWith('fc') || ip.startsWith('fd') || ip.startsWith('fe80:')) return true;
+          return false;
+        };
+        if (addrs.some(a => isPrivate(a.address))) {
+          results.issues.push('Refused to check private address');
+          results.hasIssues = true;
+          return results;
+        }
+      } catch (e) {
+        results.issues.push('DNS resolution failed');
+        results.hasIssues = true;
+        return results;
+      }
+
+      // HEAD request with tight limits
+      try {
+        const response = await axios.head(`https://${hostname}`, {
+          timeout: 6000,
+          maxRedirects: 3,
+          validateStatus: () => true
+        });
         results.hasSSL = true;
-        
-        // Check for common SSL issues in headers
-        const headers = response.headers;
-        
+        const headers = response.headers || {};
         if (!headers['strict-transport-security']) {
           results.issues.push('Missing HSTS header');
         }
-        
-        // Check for mixed content warnings
-        if (response.config.url.startsWith('https://') && 
-            response.data && 
-            response.data.includes('http://')) {
-          results.issues.push('Potential mixed content detected');
-        }
-
         results.isValid = response.status < 400;
-        
       } catch (error) {
         if (error.code === 'CERT_HAS_EXPIRED') {
           results.hasSSL = true;

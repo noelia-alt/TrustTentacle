@@ -50,6 +50,10 @@ const BlockchainService = {
   async verifyDomain(domain) {
     await delay(300);
     const normalized = String(domain).toLowerCase().trim();
+    // Prevent prototype pollution keys and invalid hosts
+    if (!/^[a-z0-9.-]+$/.test(normalized) || normalized.includes('__proto__') || normalized.includes('prototype')) {
+      return { success: false, error: 'Invalid domain', isMock: true };
+    }
     const info = mockDomains[normalized];
     if (info) {
       return {
@@ -78,6 +82,9 @@ const BlockchainService = {
   async reportDomain(domain, reporter = '0x0000000000000000000000000000000000000000') {
     await delay(500);
     const normalized = String(domain).toLowerCase().trim();
+    if (!/^[a-z0-9.-]+$/.test(normalized) || normalized.includes('__proto__') || normalized.includes('prototype')) {
+      return { success: false, error: 'Invalid domain', isMock: true };
+    }
     const txHash = `0x${Math.random().toString(16).substring(2).padEnd(64, '0')}`;
 
     if (!mockDomains[normalized]) {
@@ -140,4 +147,3 @@ const BlockchainService = {
 };
 
 module.exports = BlockchainService;
-

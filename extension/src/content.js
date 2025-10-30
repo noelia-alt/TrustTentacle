@@ -85,14 +85,30 @@
     if (notificationElement) notificationElement.remove();
     notificationElement = document.createElement('div');
     notificationElement.className = `trust-tentacle-notification trust-tentacle-${type}`;
-    notificationElement.innerHTML = `
-      <div class="trust-tentacle-content">
-        <div class="trust-tentacle-icon">TT</div>
-        <div class="trust-tentacle-message">${message}</div>
-        <button class="trust-tentacle-close" onclick="this.parentElement.parentElement.remove()">x</button>
-      </div>
-    `;
+
+    const content = document.createElement('div');
+    content.className = 'trust-tentacle-content';
+    const icon = document.createElement('div');
+    icon.className = 'trust-tentacle-icon';
+    icon.textContent = 'TT';
+    const msg = document.createElement('div');
+    msg.className = 'trust-tentacle-message';
+    msg.textContent = String(message || '');
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'trust-tentacle-close';
+    closeBtn.textContent = 'x';
+    closeBtn.addEventListener('click', () => {
+      if (notificationElement) {
+        notificationElement.remove();
+        notificationElement = null;
+      }
+    });
+    content.appendChild(icon);
+    content.appendChild(msg);
+    content.appendChild(closeBtn);
+    notificationElement.appendChild(content);
     document.body.appendChild(notificationElement);
+
     setTimeout(() => {
       if (notificationElement) {
         notificationElement.remove();
@@ -167,22 +183,31 @@
   function showReportDialog() {
     const dialog = document.createElement('div');
     dialog.className = 'trust-tentacle-report-dialog';
-    dialog.innerHTML = `
-      <div class="trust-tentacle-dialog-content">
-        <h3>Report Phishing Site</h3>
-        <p>Help protect the community by reporting this suspicious site:</p>
-        <p><strong>${window.location.href}</strong></p>
-        <textarea placeholder="Describe what makes this site suspicious..." rows="4"></textarea>
-        <div class="trust-tentacle-dialog-buttons">
-          <button class="trust-tentacle-btn-primary" onclick="submitReport()">Submit Report</button>
-          <button class="trust-tentacle-btn-secondary" onclick="this.closest('.trust-tentacle-report-dialog').remove()">Cancel</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(dialog);
 
-    window.submitReport = async function() {
-      const description = dialog.querySelector('textarea').value;
+    const content = document.createElement('div');
+    content.className = 'trust-tentacle-dialog-content';
+    const h3 = document.createElement('h3');
+    h3.textContent = 'Report Phishing Site';
+    const p1 = document.createElement('p');
+    p1.textContent = 'Help protect the community by reporting this suspicious site:';
+    const p2 = document.createElement('p');
+    const strong = document.createElement('strong');
+    strong.textContent = window.location.href;
+    p2.appendChild(strong);
+    const textarea = document.createElement('textarea');
+    textarea.setAttribute('rows', '4');
+    textarea.placeholder = 'Describe what makes this site suspicious...';
+    const btns = document.createElement('div');
+    btns.className = 'trust-tentacle-dialog-buttons';
+    const submitBtn = document.createElement('button');
+    submitBtn.className = 'trust-tentacle-btn-primary';
+    submitBtn.textContent = 'Submit Report';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'trust-tentacle-btn-secondary';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.addEventListener('click', () => dialog.remove());
+    submitBtn.addEventListener('click', async () => {
+      const description = textarea.value;
       if (description.length < 10) {
         alert('Please provide a more detailed description (at least 10 characters).');
         return;
@@ -212,7 +237,17 @@
         console.error('Report submission error:', error);
         alert('Failed to submit report. Please try again later.');
       }
-    };
+    });
+
+    btns.appendChild(submitBtn);
+    btns.appendChild(cancelBtn);
+    content.appendChild(h3);
+    content.appendChild(p1);
+    content.appendChild(p2);
+    content.appendChild(textarea);
+    content.appendChild(btns);
+    dialog.appendChild(content);
+    document.body.appendChild(dialog);
   }
 
   function shouldSkipCheck(url) {
@@ -234,4 +269,3 @@
 
   console.log('TrustTentacle content script loaded and ready!');
 })();
-
