@@ -10,6 +10,9 @@ const cacheStats = {
   keys: 0
 };
 
+// In-memory reports store for demo/report endpoints
+const reportsStore = [];
+
 // Known official entities for demo (ids align with routes/entities.js)
 const officialEntities = {
   'bancogalicia.com.ar': { id: '1', name: 'Banco Galicia', category: 'banking' },
@@ -98,6 +101,32 @@ async function checkPhishingReports(url) {
   };
 }
 
+// Submit a phishing report (demo). Pretend we wrote to chain and return a tx hash.
+async function submitPhishingReport(url, metadataCID) {
+  const txHash = '0x' + Math.random().toString(16).substring(2).padEnd(64, '0');
+  const report = {
+    id: String(Date.now()),
+    url,
+    metadataCID,
+    transactionHash: txHash,
+    blockNumber: 1,
+    timestamp: new Date().toISOString(),
+    isVerified: false
+  };
+  reportsStore.unshift(report);
+  if (reportsStore.length > 200) reportsStore.pop();
+  return {
+    reportId: report.id,
+    transactionHash: txHash,
+    blockNumber: report.blockNumber
+  };
+}
+
+// Return recent reports (demo)
+async function getRecentReports(limit = 10) {
+  return reportsStore.slice(0, Math.max(0, parseInt(limit)) || 10);
+}
+
 function getCacheStats() {
   return { ...cacheStats };
 }
@@ -107,5 +136,7 @@ module.exports = {
   isDomainOfficial,
   getEntityInfo,
   checkPhishingReports,
+  submitPhishingReport,
+  getRecentReports,
   getCacheStats
 };
