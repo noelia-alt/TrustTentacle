@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const { body, query, validationResult } = require('express-validator');
 const blockchainService = require('../services/blockchain');
 const externalAPIs = require('../services/externalAPIs');
@@ -28,7 +28,7 @@ router.post('/', [
     const { url, checkLevel = 'basic' } = req.body;
     const startTime = Date.now();
     
-    console.log(`ðŸ” Verifying URL: ${url} (level: ${checkLevel})`);
+    console.log(`🔍 Verifying URL: ${url} (level: ${checkLevel})`);
 
     // Extract domain from URL
     let domain;
@@ -56,7 +56,7 @@ router.post('/', [
 
     // Tentacle 1: Blockchain Domain Registry Check
     try {
-      console.log('ðŸ™ Tentacle 1: Checking blockchain registry...');
+      console.log('🐙 Tentacle 1: Checking blockchain registry...');
       const domainCheck = await blockchainService.isDomainOfficial(domain);
       console.log('Domain check result:', domainCheck);
       
@@ -96,10 +96,54 @@ router.post('/', [
         error: error.message
       };
     }
+    
+    // Demo Tentacle: Heuristic checks (no external APIs)
+    try {
+      const urlObj = new URL(url);
+      const host = (domain || urlObj.hostname || '').toLowerCase();
+      const path = (urlObj.pathname || '').toLowerCase();
+      const badTLDs = ['.tk', '.ml', '.ga', '.cf', '.gq'];
+      const riskyKeywords = /(login|verify|secure|account|update|billing|wallet|passcode)/i;
+      const looksTyposquatting = /(0|1|3|5|7)[a-z]|[a-z](0|1|3|5|7)/i.test(host) || /00/.test(host);
+      const hasBadTld = badTLDs.some(t => host.endsWith(t));
+      const hasRiskyKeyword = riskyKeywords.test(host) || riskyKeywords.test(path);
+
+      let demoVerdict = null;
+      let demoConfidence = 0;
+      const demoWarnings = [];
+      if (hasBadTld || (hasRiskyKeyword && looksTyposquatting)) {
+        demoVerdict = 'DANGEROUS';
+        demoConfidence = 85;
+      } else if (hasRiskyKeyword || looksTyposquatting) {
+        demoVerdict = 'SUSPICIOUS';
+        demoConfidence = 65;
+      }
+      if (hasBadTld) demoWarnings.push('Suspicious TLD often used for phishing');
+      if (hasRiskyKeyword) demoWarnings.push('Sensitive-action keywords detected in URL');
+      if (looksTyposquatting) demoWarnings.push('Possible typosquatting');
+
+      result.tentacles.demoHeuristics = {
+        name: 'Demo Heuristics',
+        status: 'completed',
+        hasBadTld,
+        hasRiskyKeyword,
+        looksTyposquatting,
+        confidence: demoConfidence
+      };
+      if (!result.verdict || result.verdict === 'UNKNOWN') {
+        if (demoVerdict) {
+          result.verdict = demoVerdict;
+          result.confidence = Math.max(result.confidence, demoConfidence);
+        }
+      }
+      result.warnings.push(...demoWarnings);
+    } catch (error) {
+      result.tentacles.demoHeuristics = { name: 'Demo Heuristics', status: 'error', error: error.message };
+    }
 
     // Tentacle 2: Phishing Reports Check
     try {
-      console.log('ðŸ™ Tentacle 2: Checking phishing reports...');
+      console.log('🐙 Tentacle 2: Checking phishing reports...');
       const phishingCheck = await blockchainService.checkPhishingReports(url);
       
       result.tentacles.phishingReports = {
@@ -130,7 +174,7 @@ router.post('/', [
     // Tentacle 3: External APIs (if full check requested)
     if (checkLevel === 'full') {
       try {
-        console.log('ðŸ™ Tentacle 3: Checking external threat intelligence...');
+        console.log('🐙 Tentacle 3: Checking external threat intelligence...');
         const externalCheck = await externalAPIs.checkURL(url);
         
         result.tentacles.externalAPIs = {
@@ -153,9 +197,9 @@ router.post('/', [
         };
       }
 
-      // Tentacle 4: AI Phishing Detection ðŸ§ 
+      // Tentacle 4: AI Phishing Detection 🧠
       try {
-        console.log('ðŸ™ Tentacle 4: AI phishing detection...');
+        console.log('🐙 Tentacle 4: AI phishing detection...');
         const aiAnalysis = await aiDetection.detectPhishing(url);
         
         result.tentacles.aiDetection = {
@@ -191,7 +235,7 @@ router.post('/', [
 
       // Tentacle 5: SSL/Certificate Analysis
       try {
-        console.log('ðŸ™ Tentacle 5: Analyzing SSL certificate...');
+        console.log('🐙 Tentacle 5: Analyzing SSL certificate...');
         const sslCheck = await externalAPIs.checkSSL(domain);
         
         result.tentacles.ssl = {
@@ -235,12 +279,13 @@ router.post('/', [
     const processingTime = Date.now() - startTime;
     result.processingTimeMs = processingTime;
     
-    console.log(`âœ… Verification completed in ${processingTime}ms - Verdict: ${result.verdict}`);
+    console.log(`Verification completed in ${processingTime}ms - Verdict: ${result.verdict}`);
 
-    try { metrics.record('verify'); metrics.record(erify_); } catch {}\n\n    res.json(result);
+    try { metrics.record('verify'); }
+    res.json(result);
 
   } catch (error) {
-    console.error('âŒ Verification error:', error);
+    console.error('❌ Verification error:', error);
     res.status(500).json({
       error: 'Verification failed',
       message: error.message,
@@ -277,10 +322,11 @@ router.get('/domain/:domain', async (req, res) => {
       result.entity = entityInfo;
     }
 
-    try { metrics.record('verify'); metrics.record(erify_); } catch {}\n\n    res.json(result);
+    try { metrics.record('verify'); }
+    res.json(result);
 
   } catch (error) {
-    console.error('âŒ Domain verification error:', error);
+    console.error('❌ Domain verification error:', error);
     res.status(500).json({
       error: 'Domain verification failed',
       message: error.message
@@ -339,7 +385,7 @@ router.post('/batch', [
     });
 
   } catch (error) {
-    console.error('âŒ Batch verification error:', error);
+    console.error('❌ Batch verification error:', error);
     res.status(500).json({
       error: 'Batch verification failed',
       message: error.message
@@ -348,6 +394,7 @@ router.post('/batch', [
 });
 
 module.exports = router;
+
 
 
 
