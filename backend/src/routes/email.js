@@ -27,8 +27,14 @@ function pushIndicator(list, severity, title, detail, source = 'email') {
 
 function normalizeSender(sender = '') {
   const trimmed = String(sender || '').trim();
-  const match = trimmed.match(/<([^>]+)>/);
-  return (match ? match[1] : trimmed).toLowerCase();
+  const start = trimmed.indexOf('<');
+  const end = trimmed.indexOf('>', start + 1);
+
+  if (start !== -1 && end !== -1 && end > start + 1) {
+    return trimmed.slice(start + 1, end).trim().toLowerCase();
+  }
+
+  return trimmed.toLowerCase();
 }
 
 function extractUrls(body = '') {
