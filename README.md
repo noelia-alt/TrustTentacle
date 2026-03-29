@@ -1,8 +1,16 @@
-# TrustTentacle
+<p align="center">
+  <img src="docs/branding/logo-octopus.png" alt="TrustTentacle logo" width="160" />
+</p>
 
-Proactive anti-phishing protection for real-time browsing.
+<h1 align="center">TrustTentacle</h1>
 
-Stage 2 finalist: Top 50 out of 900+ projects in Octopus Hackathon 2025.
+<p align="center">
+  Proactive anti-phishing protection for real-time browsing.
+</p>
+
+<p align="center">
+  <strong>  <strong>Octopus Hackathon 2025</strong> | Stage 2 finalist | Top 50 out of 900+ projects
+</p>
 
 ## Problem
 
