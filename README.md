@@ -1,159 +1,133 @@
-# 🐙 TrustTentacle - Digital Trust Guardian
+# TrustTentacle
 
-> A tentacle of trust against digital fraud  
-> **Octopus Hackathon 2025 - Official Project**
+> Real-time anti-phishing protection for everyday browsing  
+> Stage 2 finalist: **Top 50 project** in Octopus Hackathon: season 1 (2025)
 
-TrustTentacle is an anti-phishing protection system that combines AI and blockchain to create a "guardian octopus" that protects users in real-time while navigating the digital ocean.
+TrustTentacle is a browser-based digital trust layer designed to reduce phishing, impersonation, and social engineering risk before a user is compromised. It combines a Chrome extension, a verification backend, a monitoring dashboard, and an optional blockchain registry architecture to deliver proactive protection instead of reactive cleanup.
 
-**🏆 Specially designed for Octopus Hackathon 2025** - where the intelligence of the octopus meets blockchain technology to create the smartest digital guardian in the ocean.
+## The Problem
 
-## 🌊 The Problem
+Phishing attacks no longer depend on crude fake pages. Modern campaigns rely on domain impersonation, social engineering, cloned login experiences, and short-lived infrastructure that can fool users before traditional blacklists react.
 
-Digital fraud like banking phishing grows every year. Thousands of people lose money without realizing it by clicking on fake sites or deceptive emails.
+For users and organizations, this creates a clear gap:
 
-## 🐙 The Solution
+- Too much trust is placed on the browser alone
+- Detection often happens after credentials or payments are already compromised
+- Legitimate domains are hard to verify in real time
+- Reporting and threat sharing are fragmented
 
-TrustTentacle extends its 8 tentacles to protect you:
+## The Solution
 
-1. **AI Tentacle**: Detects phishing with machine learning
-2. **Blockchain Tentacle**: Verifies official domains in immutable registry
-3. **SSL Tentacle**: Analyzes certificates and secure connections
-4. **Intel Tentacle**: Queries threat databases
-5. **Community Tentacle**: Collaborative user reports
-6. **Visual Tentacle**: Visual similarity analysis of sites
-7. **Behavioral Tentacle**: Detects suspicious patterns
-8. **Shield Tentacle**: Real-time protection
+TrustTentacle adds a real-time verification layer to browsing.
 
-## 🏗️ Architecture
+When a user visits a page, the system evaluates the URL and page context through multiple signals, then returns a simple decision: safe, suspicious, dangerous, or unverified.
 
-```
+The current MVP focuses on a realistic Stage 2 scope:
+
+- **Browser protection** through a Chrome extension
+- **Heuristic risk analysis** for suspicious URLs and phishing indicators
+- **Official-domain verification** through a trusted registry model
+- **Community reporting** for suspicious pages and links
+- **Dashboard visibility** for activity and threat trends
+
+## Core MVP
+
+### What works today
+
+- Chrome extension with popup, context menu actions, notifications, and live site checks
+- Backend API for verification, reporting, stats, entities, domains, and threat activity
+- Web dashboard for protection metrics and recent activity
+- Demo-ready official domain verification flow
+- Community phishing report submission flow
+- Health status and graceful fallback when the backend is offline
+- Optional smart contracts included in the repo for registry-based verification architecture
+
+### MVP positioning
+
+For the current MVP, TrustTentacle is presented as a **preventive anti-phishing control** with a browser-first experience and a modular trust engine behind it.
+
+Instead of claiming a fully decentralized production security stack, this Stage 2 version proves the most important thing:  
+**the user can be warned or protected during navigation, before trust is misplaced.**
+
+## Architecture
+
+> Place your architecture image at `docs/architecture-stage2.png` or update the path below.
+
+![TrustTentacle Architecture](docs/architecture-stage2.png)
+
+### High-level flow
+
+1. The user navigates to a page in the browser
+2. The Chrome extension captures the current URL and triggers verification
+3. The backend evaluates the request using multiple trust signals
+4. The decision engine returns a verdict
+5. The extension shows the result and allows reporting if needed
+6. The dashboard surfaces verification and reporting activity
+
+### Main components
+
+- **Chrome Extension**
+  - Popup UI
+  - Context menu actions
+  - Notifications
+  - Content script protection cues
+- **Backend API**
+  - URL verification
+  - Community reports
+  - Threat and stats endpoints
+  - Optional external threat-intel integrations
+- **Web Dashboard**
+  - Activity trends
+  - Protection metrics
+  - Threat visibility
+- **Smart Contracts**
+  - Domain registry
+  - Entity registry
+  - Phishing reports contract
+  - Polygon Amoy-ready architecture
+
+## Tech Stack
+
+### Frontend
+- React
+- Vite
+- Recharts
+- Tailwind CSS
+
+### Extension
+- Chrome Extension Manifest V3
+- JavaScript
+- Webpack
+
+### Backend
+- Node.js
+- Express
+- Axios
+- Express Validator
+- Helmet
+- CORS
+- Rate limiting
+
+### Blockchain
+- Solidity
+- Hardhat
+- Ethers.js
+- Polygon Amoy
+
+### Supporting Services
+- IPFS mock/local demo flow
+- VirusTotal integration support
+- Google Safe Browsing integration support
+- Shodan integration support
+
+## Repository Structure
+
+```text
 TrustTentacles/
-├── contracts/          # Smart contracts (Solidity)
-├── backend/            # API server (Node.js/Express)
-├── extension/          # Chrome extension (MV3)
-├── web/               # Web dashboard (React/Vite)
-├── docs/              # Documentation
-└── scripts/           # Deployment and utilities
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Node.js 18+** - JavaScript runtime
-- **pnpm** - Package manager (faster than npm)
-- **Git** - Version control
-- **MetaMask** - Wallet to interact with blockchain
-- **Chrome/Edge** - For extension testing
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/noelia-alt/TrustTentacle.git
-cd TrustTentacle
-
-# Install pnpm globally if you don't have it
-npm install -g pnpm
-
-# Install all dependencies
-pnpm install:all
-```
-
-### Development
-
-```bash
-# Compile smart contracts
-pnpm contracts:compile
-
-# Deploy on Polygon Amoy testnet
-pnpm contracts:deploy
-
-# Start backend API (port 3001)
-pnpm backend:dev
-
-# Build extension for development
-pnpm extension:dev
-
-# Start web dashboard
-pnpm web:dev
-
-# Run everything in parallel
-pnpm dev:all
-```
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-pnpm test:all
-
-# Specific tests
-pnpm contracts:test    # Contract tests
-pnpm backend:test      # API tests
-pnpm extension:test    # Extension tests
-```
-
-## 📦 Deployment
-
-### Testnet (Polygon Amoy)
-
-```bash
-# Complete testnet deployment
-pnpm deploy:testnet
-```
-
-### Production
-
-```bash
-# Build and deploy to production
-pnpm deploy:prod
-```
-
-### Useful Commands
-
-```bash
-# Clean node_modules and builds
-pnpm clean
-
-# Security audit
-pnpm audit
-
-# Format code
-pnpm format
-
-# Linting
-pnpm lint
-```
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create a feature branch (`git checkout -b feature/new-feature`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature/new-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
-## 🐙 Team
-
-Developed with 🧠 and ☕ for **Octopus Hackathon 2025** (October 1-31, 2025).
-
----
-
-## 🏆 Octopus Hackathon 2025
-
-**"In the digital ocean, only the smartest octopus can protect you"**
-
-TrustTentacle represents the natural evolution of the octopus concept: an intelligent, adaptable creature with multiple tentacles working in parallel. Each tentacle of our system has a specific function, but all work together for a common goal: **your digital security**.
-
-### Why an octopus?
-- **8 tentacles = 8 protection systems** working simultaneously
-- **Distributed intelligence**: each tentacle can act independently
-- **Adaptability**: adjusts to new threats in real-time
-- **Survival**: the octopus is one of the most intelligent animals in the ocean
-
-**"Navigate safely in the digital ocean"** 🌊🔐
+├── backend/      # Node.js / Express verification API
+├── contracts/    # Solidity smart contracts and deployment scripts
+├── extension/    # Chrome extension (MV3)
+├── web/          # React / Vite dashboard
+├── scripts/      # Setup and deployment helpers
+├── QUICKSTART.md
+└── TESTING.md
