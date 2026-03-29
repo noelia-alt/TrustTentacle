@@ -68,6 +68,14 @@ router.get('/', [
         category: 'fintech'
       },
       {
+        domain: 'devpost.com',
+        entityId: '5',
+        entityName: 'Devpost',
+        isActive: true,
+        addedAt: '2024-10-01T00:00:00.000Z',
+        category: 'tech'
+      },
+      {
         domain: 'uala.com.ar',
         entityId: '4',
         entityName: 'Ualá',
@@ -125,6 +133,7 @@ router.get('/search', [
       'net.bbva.com.ar',
       'mercadopago.com.ar',
       'mercadopago.com',
+      'devpost.com',
       'uala.com.ar'
     ];
 
@@ -176,6 +185,7 @@ router.get('/similar/:domain', async (req, res) => {
       'bancogalicia.com.ar',
       'bbva.com.ar', 
       'mercadopago.com.ar',
+      'devpost.com',
       'uala.com.ar'
     ];
 

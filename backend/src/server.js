@@ -35,6 +35,7 @@ app.use('/api/', limiter);
 
 // Routes
 app.use('/api/v1/verify', require('./routes/verify'));
+app.use('/api/v1/email', require('./routes/email'));
 app.use('/api/v1/report', require('./routes/report'));
 app.use('/api/v1/entities', require('./routes/entities'));
 app.use('/api/v1/domains', require('./routes/domains'));
@@ -60,6 +61,7 @@ app.use('*', (req, res) => {
     availableEndpoints: [
       'GET /health',
       'POST /api/v1/verify',
+      'POST /api/v1/email/analyze',
       'POST /api/v1/report',
       'GET /api/v1/entities',
       'GET /api/v1/domains',

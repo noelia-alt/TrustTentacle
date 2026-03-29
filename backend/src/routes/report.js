@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const blockchainService = require('../services/blockchain');
 const ipfsService = require('../services/ipfs-mock'); // Using mock for Node.js 22 compatibility
+const metrics = require('../services/metrics');
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ const router = express.Router();
 router.post('/', [
   body('url').isURL().withMessage('Valid URL required'),
   body('description').isLength({ min: 10, max: 500 }).withMessage('Description must be 10-500 characters'),
-  body('category').optional().isIn(['phishing', 'malware', 'scam', 'fake_site']).withMessage('Invalid category'),
+  body('category').optional().isIn(['phishing', 'malware', 'scam', 'fake_site', 'smishing', 'brand_impersonation']).withMessage('Invalid category'),
   body('evidence').optional().isObject().withMessage('Evidence must be an object')
 ], async (req, res) => {
   try {
@@ -28,7 +29,7 @@ router.post('/', [
     const { url, description, category = 'phishing', evidence = {} } = req.body;
     const reporterIP = req.ip;
     
-    console.log(`🎣 New phishing report for: ${url}`);
+    console.log(`New phishing report for: ${url}`);
 
     // Prepare metadata for IPFS
     const metadata = {
@@ -43,12 +44,12 @@ router.post('/', [
     };
 
     // Upload metadata to IPFS
-    console.log('📤 Uploading report metadata to IPFS...');
+    console.log('Uploading report metadata to IPFS...');
     const metadataCID = await ipfsService.uploadJSON(metadata);
-    console.log(`✅ Metadata uploaded to IPFS: ${metadataCID}`);
+    console.log(`Metadata uploaded to IPFS: ${metadataCID}`);
 
     // Submit report to blockchain
-    console.log('⛓️  Submitting report to blockchain...');
+    console.log('Submitting report to blockchain...');
     const txResult = await blockchainService.submitPhishingReport(url, metadataCID);
     
     const result = {
@@ -60,15 +61,16 @@ router.post('/', [
       transactionHash: txResult.transactionHash,
       blockNumber: txResult.blockNumber,
       timestamp: new Date().toISOString(),
-      message: 'Report submitted successfully. Thank you for helping protect the community! 🐙'
+      message: 'Report submitted successfully. Thank you for helping protect the community.'
     };
 
-    console.log(`✅ Report submitted successfully - TX: ${txResult.transactionHash}`);
+    try { metrics.record('report'); } catch {}
+    console.log(`Report submitted successfully - TX: ${txResult.transactionHash}`);
     
     res.status(201).json(result);
 
   } catch (error) {
-    console.error('❌ Report submission error:', error);
+    console.error('Report submission error:', error);
     
     // Handle specific error types
     if (error.message.includes('Rate limit')) {
@@ -104,7 +106,7 @@ router.get('/recent', async (req, res) => {
     const { limit = 10 } = req.query;
     const maxLimit = Math.min(parseInt(limit), 50);
 
-    console.log(`📋 Fetching ${maxLimit} recent reports...`);
+    console.log(`Fetching ${maxLimit} recent reports...`);
     
     const reports = await blockchainService.getRecentReports(maxLimit);
     
@@ -139,7 +141,7 @@ router.get('/recent', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error fetching recent reports:', error);
+    console.error('Error fetching recent reports:', error);
     res.status(500).json({
       error: 'Failed to fetch reports',
       message: error.message
@@ -164,7 +166,9 @@ router.get('/stats', async (req, res) => {
         phishing: 0,
         malware: 0,
         scam: 0,
-        fake_site: 0
+        fake_site: 0,
+        smishing: 0,
+        brand_impersonation: 0
       },
       recentActivity: [],
       timestamp: new Date().toISOString()
@@ -180,6 +184,12 @@ router.get('/stats', async (req, res) => {
       new Date(report.timestamp).toDateString() === today
     ).length;
 
+    for (const report of recentReports) {
+      const category = report.category || 'phishing';
+      if (!stats.topCategories[category]) stats.topCategories[category] = 0;
+      stats.topCategories[category] += 1;
+    }
+
     // Activity summary (last 24 hours)
     const last24h = Date.now() - (24 * 60 * 60 * 1000);
     stats.recentActivity = recentReports
@@ -193,7 +203,7 @@ router.get('/stats', async (req, res) => {
     res.json(stats);
 
   } catch (error) {
-    console.error('❌ Error fetching report stats:', error);
+    console.error('Error fetching report stats:', error);
     res.status(500).json({
       error: 'Failed to fetch statistics',
       message: error.message
@@ -217,7 +227,7 @@ router.post('/verify/:reportId', [
     // TODO: Implement proper authentication/authorization
     // For now, this is a placeholder for the verification system
     
-    console.log(`🔍 Verifying report ${reportId}...`);
+    console.log(`Verifying report ${reportId}...`);
 
     // This would typically verify the verifier's credentials
     // and then call the blockchain service to verify the report
@@ -229,7 +239,7 @@ router.post('/verify/:reportId', [
     });
 
   } catch (error) {
-    console.error('❌ Report verification error:', error);
+    console.error('Report verification error:', error);
     res.status(500).json({
       error: 'Verification failed',
       message: error.message
@@ -238,3 +248,4 @@ router.post('/verify/:reportId', [
 });
 
 module.exports = router;
+

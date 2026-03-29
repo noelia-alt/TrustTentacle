@@ -45,10 +45,26 @@ function getSnapshot() {
   return Object.fromEntries(counters);
 }
 
+function getTotalsByType(days = 7) {
+  const out = {};
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setUTCDate(now.getUTCDate() - i);
+    const key = dateKey(d);
+    const day = counters.get(key);
+    if (!day) continue;
+    for (const [type, value] of Object.entries(day.byType || {})) {
+      out[type] = (out[type] || 0) + value;
+    }
+  }
+  return out;
+}
+
 module.exports = {
   record,
   getSeries,
   getSummary,
   getSnapshot,
+  getTotalsByType,
 };
-

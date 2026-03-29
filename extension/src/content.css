@@ -193,6 +193,167 @@
   background: #e5e5e5;
 }
 
+/* Risk Panel */
+.trust-tentacle-risk-overlay,
+.trust-tentacle-risk-drawer {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.trust-tentacle-risk-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 9, 18, 0.7);
+  z-index: 1000001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.trust-tentacle-risk-drawer {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: min(420px, calc(100vw - 40px));
+  z-index: 1000000;
+}
+
+.trust-tentacle-risk-container {
+  background: linear-gradient(180deg, #071726 0%, #0d2438 100%);
+  color: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  box-shadow: 0 18px 64px rgba(0, 0, 0, 0.35);
+  padding: 20px;
+}
+
+.trust-tentacle-risk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.trust-tentacle-risk-header h3 {
+  margin: 4px 0 0 0;
+  font-size: 22px;
+}
+
+.trust-tentacle-risk-eyebrow {
+  color: #7dd3fc;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.trust-tentacle-risk-badge {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.trust-tentacle-risk-dangerous {
+  background: rgba(239, 68, 68, 0.18);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.trust-tentacle-risk-suspicious {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fde68a;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.trust-tentacle-risk-unverified {
+  background: rgba(148, 163, 184, 0.18);
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.trust-tentacle-risk-summary {
+  color: #dbeafe;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}
+
+.trust-tentacle-risk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.trust-tentacle-risk-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trust-tentacle-risk-indicators.hidden {
+  display: none;
+}
+
+.trust-tentacle-indicator-row {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(125, 211, 252, 0.14);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.trust-tentacle-indicator-severity {
+  align-self: start;
+  text-align: center;
+  border-radius: 999px;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.trust-tentacle-indicator-high {
+  background: rgba(239, 68, 68, 0.18);
+  color: #fecaca;
+}
+
+.trust-tentacle-indicator-medium {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fde68a;
+}
+
+.trust-tentacle-indicator-low {
+  background: rgba(34, 197, 94, 0.18);
+  color: #bbf7d0;
+}
+
+.trust-tentacle-indicator-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.trust-tentacle-indicator-detail {
+  color: #dbeafe;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.trust-tentacle-indicator-source {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.trust-tentacle-wallet-guarded {
+  outline: 2px solid rgba(245, 158, 11, 0.8) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18) !important;
+}
+
 /* Animations */
 @keyframes trustTentacleSlideIn {
   from {
@@ -261,6 +422,21 @@
   .trust-tentacle-dialog-content {
     margin: 20px;
     width: calc(100% - 40px);
+  }
+
+  .trust-tentacle-risk-overlay {
+    padding: 14px;
+  }
+
+  .trust-tentacle-risk-drawer {
+    right: 10px;
+    left: 10px;
+    bottom: 10px;
+    width: auto;
+  }
+
+  .trust-tentacle-indicator-row {
+    grid-template-columns: 1fr;
   }
 }
 

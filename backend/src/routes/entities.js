@@ -55,6 +55,15 @@ router.get('/', [
         isActive: true,
         domainCount: 1,
         createdAt: '2024-10-01T00:00:00.000Z'
+      },
+      {
+        id: '5',
+        name: 'Devpost',
+        website: 'https://devpost.com',
+        country: 'US',
+        isActive: true,
+        domainCount: 1,
+        createdAt: '2024-10-01T00:00:00.000Z'
       }
     ];
 
@@ -141,6 +150,15 @@ router.get('/:entityId', async (req, res) => {
           isActive: true,
           createdAt: '2024-10-01T00:00:00.000Z',
           updatedAt: '2024-10-01T00:00:00.000Z'
+        },
+        '5': {
+          id: '5',
+          name: 'Devpost',
+          website: 'https://devpost.com',
+          country: 'US',
+          isActive: true,
+          createdAt: '2024-10-01T00:00:00.000Z',
+          updatedAt: '2024-10-01T00:00:00.000Z'
         }
       };
 
@@ -182,7 +200,8 @@ router.get('/:entityId/domains', async (req, res) => {
       '1': ['bancogalicia.com.ar', 'onlinebanking.bancogalicia.com.ar'],
       '2': ['bbva.com.ar', 'net.bbva.com.ar'],
       '3': ['mercadopago.com.ar', 'mercadopago.com'],
-      '4': ['uala.com.ar']
+      '4': ['uala.com.ar'],
+      '5': ['devpost.com']
     };
 
     const domains = entityDomains[entityId];
@@ -230,6 +249,7 @@ router.get('/search', [
       { id: '1', name: 'Banco Galicia', country: 'AR' },
       { id: '2', name: 'BBVA Argentina', country: 'AR' },
       { id: '3', name: 'Mercado Pago', country: 'AR' },
+      { id: '5', name: 'Devpost', country: 'US' },
       { id: '4', name: 'Ualá', country: 'AR' }
     ];
 

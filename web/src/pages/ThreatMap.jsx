@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { API_BASE_URL } from '../config'
 
 export default function ThreatMap() {
   const [threats, setThreats] = useState([])
@@ -16,7 +17,7 @@ export default function ThreatMap() {
   useEffect(() => {
     const fetchThreats = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/v1/threats/recent')
+        const response = await fetch(`${API_BASE_URL}/threats/recent`)
         const data = await response.json()
         if (data.success) {
           setThreats(data.threats)

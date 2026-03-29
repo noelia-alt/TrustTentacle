@@ -14,10 +14,10 @@ function App() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar onNavigate={setCurrentPage} currentPage={currentPage} />
       <main style={{ flexGrow: 1 }}>
-        {currentPage === 'home' && <Home />}
+        {currentPage === 'home' && <Home onNavigate={setCurrentPage} />}
         {currentPage === 'dashboard' && <Dashboard />}
         {currentPage === 'helper' && <DecisionHelper />}
-        {currentPage === 'simulator' && <PhishingSimulator />}
+        {currentPage === 'simulator' && <PhishingSimulator onNavigate={setCurrentPage} />}
         {currentPage === 'map' && <ThreatMap />}
       </main>
       {currentPage !== 'simulator' && <Footer />}

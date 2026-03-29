@@ -2,6 +2,14 @@
 
 let API_BASE_URL_DEFAULT = 'http://localhost:3001/api/v1';
 let apiBaseCache = null;
+const NOTIFY_ICON = 'icons/octopus-logo.png';
+
+async function incrementStat(field, amount = 1) {
+  const current = await chrome.storage.local.get({ [field]: 0 });
+  const next = (parseInt(current[field], 10) || 0) + amount;
+  await chrome.storage.local.set({ [field]: next });
+  return next;
+}
 
 async function getApiBaseUrl() {
   try {
@@ -22,7 +30,7 @@ chrome.runtime.onInstalled.addListener((details) => {
     // Show welcome notification
     chrome.notifications.create({
       type: 'basic',
-      iconUrl: 'icons/icon-48.png',
+      iconUrl: NOTIFY_ICON,
       title: 'TrustTentacle Activated!',
       message: 'Your digital octopus guardian is now protecting you from phishing attacks.'
     });
@@ -35,6 +43,12 @@ chrome.runtime.onInstalled.addListener((details) => {
       checkLevel: 'basic',
       theme: 'ocean',
       apiBaseUrl: API_BASE_URL_DEFAULT
+    });
+    chrome.storage.local.set({
+      installDate: Date.now(),
+      urlsChecked: 0,
+      threatsBlocked: 0,
+      reportsSubmitted: 0
     });
   }
 
@@ -100,7 +114,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       // Show a compact notification with verdict
       chrome.notifications.create({
         type: 'basic',
-        iconUrl: 'icons/icon-48.png',
+        iconUrl: NOTIFY_ICON,
         title: 'Link check result',
         message: `${result.verdict}: ${new URL(info.linkUrl).hostname}`
       });
@@ -111,7 +125,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       const result = await handleCheckURL(pageUrl, tId);
       chrome.notifications.create({
         type: 'basic',
-        iconUrl: 'icons/icon-48.png',
+        iconUrl: NOTIFY_ICON,
         title: 'Page check result',
         message: `${result.verdict}: ${new URL(pageUrl).hostname}`
       });
@@ -146,7 +160,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     console.error('Context menu check failed:', err);
     chrome.notifications.create({
       type: 'basic',
-      iconUrl: 'icons/icon-48.png',
+      iconUrl: NOTIFY_ICON,
       title: 'Check failed',
       message: 'Could not verify the link.'
     });
@@ -173,7 +187,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   switch (message.type) {
     case 'CHECK_URL':
-      handleCheckURL(message.url, sender.tab?.id)
+      handleCheckURL(message.url, sender.tab?.id, {
+        domSignals: message.domSignals,
+        pageContext: message.pageContext,
+        preferDomContext: !!message.domSignals
+      })
         .then(sendResponse)
         .catch(error => sendResponse({ error: error.message }));
       return true;
@@ -207,15 +225,30 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // Main URL checking function
-async function checkURL(url, tabId) {
+async function checkURL(url, tabId, context = {}) {
   try {
     console.log(`Checking URL: ${url}`);
     const settings = await getSettings();
     const base = await getApiBaseUrl();
+    const cacheKey = tabId ? `result_${tabId}` : null;
+    const cached = cacheKey ? await chrome.storage.local.get([cacheKey]) : {};
+    const cachedResult = cacheKey ? cached[cacheKey] : null;
+    const cacheIsFresh = cachedResult && cachedResult.url === url && Date.now() - cachedResult.timestamp < 15000;
+    const cachedHasDomContext = !!cachedResult?.analysisContext?.domSignalsProcessed;
+
+    if (cacheIsFresh && (!context.preferDomContext || cachedHasDomContext)) {
+      return cachedResult;
+    }
+
     const response = await fetch(`${base.replace(/\/$/, '')}/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, checkLevel: settings.checkLevel || 'basic' })
+      body: JSON.stringify({
+        url,
+        checkLevel: settings.checkLevel || 'basic',
+        domSignals: context.domSignals || undefined,
+        pageContext: context.pageContext || undefined
+      })
     });
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     const result = await response.json();
@@ -226,7 +259,7 @@ async function checkURL(url, tabId) {
     if (settings.notifications && (result.verdict === 'DANGEROUS' || result.verdict === 'SUSPICIOUS')) {
       chrome.notifications.create({
         type: 'basic',
-        iconUrl: 'icons/icon-48.png',
+        iconUrl: NOTIFY_ICON,
         title: (result.verdict === 'DANGEROUS' ? 'Danger' : 'Warning'),
         message: result.verdict === 'DANGEROUS'
           ? 'This site has been reported as dangerous!'
@@ -234,9 +267,19 @@ async function checkURL(url, tabId) {
       });
     }
 
-    await chrome.storage.local.set({
-      [`result_${tabId}`]: { ...result, timestamp: Date.now() }
-    });
+    if (cacheKey) {
+      await chrome.storage.local.set({
+        [cacheKey]: { ...result, timestamp: Date.now() }
+      });
+    }
+
+    const shouldCountMetrics = !(cacheIsFresh && cachedResult?.url === url);
+    if (shouldCountMetrics) {
+      await incrementStat('urlsChecked', 1);
+      if (result.verdict === 'DANGEROUS' || result.verdict === 'SUSPICIOUS') {
+        await incrementStat('threatsBlocked', 1);
+      }
+    }
 
     return result;
   } catch (error) {
@@ -246,8 +289,8 @@ async function checkURL(url, tabId) {
   }
 }
 
-async function handleCheckURL(url, tabId) {
-  return await checkURL(url, tabId);
+async function handleCheckURL(url, tabId, context = {}) {
+  return await checkURL(url, tabId, context);
 }
 
 // Handle phishing reports
@@ -264,7 +307,7 @@ async function handleReportPhishing(reportData) {
 
     chrome.notifications.create({
       type: 'basic',
-      iconUrl: 'icons/icon-48.png',
+      iconUrl: NOTIFY_ICON,
       title: 'Report Submitted!',
       message: 'Thank you for helping protect the community!'
     });
@@ -277,6 +320,8 @@ async function handleReportPhishing(reportData) {
         source: reportData.evidence?.reportedFrom || 'background'
       });
     } catch {}
+
+    await incrementStat('reportsSubmitted', 1);
 
     return result;
   } catch (error) {
@@ -325,6 +370,10 @@ async function getStats() {
     reportsSubmitted: 0,
     installDate: Date.now()
   });
+  if (!result.installDate) {
+    result.installDate = Date.now();
+    await chrome.storage.local.set({ installDate: result.installDate });
+  }
   return {
     ...result,
     daysSinceInstall: Math.floor((Date.now() - result.installDate) / (1000 * 60 * 60 * 24))
@@ -367,3 +416,4 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 console.log('TrustTentacle background script loaded!');
+

@@ -19,7 +19,8 @@ const officialEntities = {
   'bbva.com.ar': { id: '2', name: 'BBVA Argentina', category: 'banking' },
   'mercadopago.com.ar': { id: '3', name: 'Mercado Pago', category: 'fintech' },
   'mercadopago.com': { id: '3', name: 'Mercado Pago', category: 'fintech' },
-  'uala.com.ar': { id: '4', name: 'Ualá', category: 'fintech' }
+  'uala.com.ar': { id: '4', name: 'Ualá', category: 'fintech' },
+  'devpost.com': { id: '5', name: 'Devpost', category: 'tech' }
 };
 
 function normalizeDomain(domain) {
@@ -85,7 +86,8 @@ async function getEntityInfo(entityId) {
     '1': { id: '1', name: 'Banco Galicia', website: 'https://bancogalicia.com.ar', country: 'AR', verified: true },
     '2': { id: '2', name: 'BBVA Argentina', website: 'https://bbva.com.ar', country: 'AR', verified: true },
     '3': { id: '3', name: 'Mercado Pago', website: 'https://mercadopago.com.ar', country: 'AR', verified: true },
-    '4': { id: '4', name: 'Ualá', website: 'https://uala.com.ar', country: 'AR', verified: true }
+    '4': { id: '4', name: 'Ualá', website: 'https://uala.com.ar', country: 'AR', verified: true },
+    '5': { id: '5', name: 'Devpost', website: 'https://devpost.com', country: 'US', verified: true }
   };
   if (map[entityId]) return map[entityId];
   // Fallback generic object
@@ -93,11 +95,32 @@ async function getEntityInfo(entityId) {
 }
 
 async function checkPhishingReports(url) {
-  // Demo implementation: no real reports; structure matches verify.js expectations
+  let normalizedUrl = '';
+  let host = '';
+  try {
+    const u = new URL(url);
+    normalizedUrl = u.toString();
+    host = normalizeDomain(u.hostname);
+  } catch {
+    normalizedUrl = String(url || '');
+  }
+
+  const matches = reportsStore.filter((r) => {
+    if (!r || !r.url) return false;
+    if (r.url === normalizedUrl) return true;
+    try {
+      const h = normalizeDomain(new URL(r.url).hostname);
+      return host && h === host;
+    } catch {
+      return false;
+    }
+  });
+
+  const reportCount = matches.length;
   return {
-    isReported: false,
-    reportCount: 0,
-    isBlacklisted: false
+    isReported: reportCount > 0,
+    reportCount,
+    isBlacklisted: reportCount >= 3
   };
 }
 

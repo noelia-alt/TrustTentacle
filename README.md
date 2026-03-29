@@ -1,133 +1,162 @@
 # TrustTentacle
 
-> Real-time anti-phishing protection for everyday browsing  
-> Stage 2 finalist: **Top 50 project** in Octopus Hackathon: season 1 (2025)
+Proactive anti-phishing protection for real-time browsing.
 
-TrustTentacle is a browser-based digital trust layer designed to reduce phishing, impersonation, and social engineering risk before a user is compromised. It combines a Chrome extension, a verification backend, a monitoring dashboard, and an optional blockchain registry architecture to deliver proactive protection instead of reactive cleanup.
+Stage 2 finalist: Top 50 out of 900+ projects in Octopus Hackathon 2025.
 
-## The Problem
+## Problem
 
-Phishing attacks no longer depend on crude fake pages. Modern campaigns rely on domain impersonation, social engineering, cloned login experiences, and short-lived infrastructure that can fool users before traditional blacklists react.
+Phishing, domain impersonation, and social engineering attacks still bypass user awareness and many reactive defenses. Users need a preventive trust layer while they browse, before they submit credentials, connect wallets, or trust a malicious page.
 
-For users and organizations, this creates a clear gap:
+## Solution
 
-- Too much trust is placed on the browser alone
-- Detection often happens after credentials or payments are already compromised
-- Legitimate domains are hard to verify in real time
-- Reporting and threat sharing are fragmented
+TrustTentacle is a browser-first anti-phishing MVP that combines:
 
-## The Solution
+- Chrome extension protection for live browsing
+- Heuristic risk analysis in a Node.js backend
+- Verified domain intelligence for trusted destinations
+- Community phishing reporting
+- Explainable risk indicators in dangerous flows
+- A manual Email Risk Analyzer for suspicious messages
+- Dashboard visibility for metrics and recent detections
 
-TrustTentacle adds a real-time verification layer to browsing.
+The repository also includes smart contracts and a blockchain-ready architecture, while the current Stage 2 MVP is optimized for local reliability and a stable live demo.
 
-When a user visits a page, the system evaluates the URL and page context through multiple signals, then returns a simple decision: safe, suspicious, dangerous, or unverified.
+## Core MVP Scope
 
-The current MVP focuses on a realistic Stage 2 scope:
+Implemented and demo-ready:
 
-- **Browser protection** through a Chrome extension
-- **Heuristic risk analysis** for suspicious URLs and phishing indicators
-- **Official-domain verification** through a trusted registry model
-- **Community reporting** for suspicious pages and links
-- **Dashboard visibility** for activity and threat trends
+- URL verification with `SAFE`, `SUSPICIOUS`, `DANGEROUS`, and `UNVERIFIED` verdicts
+- Browser extension popup, automatic checks, and context-menu actions
+- Explainable `Risk Indicators` in dangerous site flows
+- Community phishing report submission from the extension
+- Web dashboard consuming backend activity metrics
+- Manual Email Risk Analyzer for suspicious sender, subject, body, and embedded links
 
-## Core MVP
+Roadmap:
 
-### What works today
-
-- Chrome extension with popup, context menu actions, notifications, and live site checks
-- Backend API for verification, reporting, stats, entities, domains, and threat activity
-- Web dashboard for protection metrics and recent activity
-- Demo-ready official domain verification flow
-- Community phishing report submission flow
-- Health status and graceful fallback when the backend is offline
-- Optional smart contracts included in the repo for registry-based verification architecture
-
-### MVP positioning
-
-For the current MVP, TrustTentacle is presented as a **preventive anti-phishing control** with a browser-first experience and a modular trust engine behind it.
-
-Instead of claiming a fully decentralized production security stack, this Stage 2 version proves the most important thing:  
-**the user can be warned or protected during navigation, before trust is misplaced.**
+- Expanded threat-intelligence integrations
+- Deeper visual and behavioral analysis
+- Full production-grade on-chain verification workflows
+- Mail client integrations and header validation
 
 ## Architecture
 
-> Place your architecture image at `docs/architecture-stage2.png` or update the path below.
+![TrustTentacle Stage 2 Architecture](docs/architecture-stage2.png)
 
-![TrustTentacle Architecture](docs/architecture-stage2.png)
-
-### High-level flow
-
-1. The user navigates to a page in the browser
-2. The Chrome extension captures the current URL and triggers verification
-3. The backend evaluates the request using multiple trust signals
-4. The decision engine returns a verdict
-5. The extension shows the result and allows reporting if needed
-6. The dashboard surfaces verification and reporting activity
-
-### Main components
-
-- **Chrome Extension**
-  - Popup UI
-  - Context menu actions
-  - Notifications
-  - Content script protection cues
-- **Backend API**
-  - URL verification
-  - Community reports
-  - Threat and stats endpoints
-  - Optional external threat-intel integrations
-- **Web Dashboard**
-  - Activity trends
-  - Protection metrics
-  - Threat visibility
-- **Smart Contracts**
-  - Domain registry
-  - Entity registry
-  - Phishing reports contract
-  - Polygon Amoy-ready architecture
-
-## Tech Stack
-
-### Frontend
-- React
-- Vite
-- Recharts
-- Tailwind CSS
-
-### Extension
-- Chrome Extension Manifest V3
-- JavaScript
-- Webpack
-
-### Backend
-- Node.js
-- Express
-- Axios
-- Express Validator
-- Helmet
-- CORS
-- Rate limiting
-
-### Blockchain
-- Solidity
-- Hardhat
-- Ethers.js
-- Polygon Amoy
-
-### Supporting Services
-- IPFS mock/local demo flow
-- VirusTotal integration support
-- Google Safe Browsing integration support
-- Shodan integration support
-
-## Repository Structure
+Repository structure:
 
 ```text
 TrustTentacles/
-├── backend/      # Node.js / Express verification API
-├── contracts/    # Solidity smart contracts and deployment scripts
-├── extension/    # Chrome extension (MV3)
-├── web/          # React / Vite dashboard
-├── scripts/      # Setup and deployment helpers
-├── QUICKSTART.md
-└── TESTING.md
+|-- backend/      # Node.js / Express API
+|-- contracts/    # Solidity contracts (roadmap-ready)
+|-- extension/    # Chrome extension (MV3)
+|-- web/          # React / Vite dashboard
+|-- docs/         # Architecture and repository media assets
+`-- scripts/      # Operational scripts
+```
+
+## Screenshots
+
+### Extension Popup
+
+Safe verdict:
+
+![Extension Popup Safe](docs/screenshots/extension-popup-safe.png)
+
+Danger verdict:
+
+![Extension Popup Danger](docs/screenshots/extension-popup-danger.png)
+
+### Web Dashboard
+
+Dashboard overview:
+
+![Web Dashboard Overview](docs/screenshots/web-dashboard-overview.png)
+
+Decision Helper with URL and email analysis:
+
+![Web Decision Helper](docs/screenshots/web-decision-helper.png)
+
+Threat Map:
+
+![Web Threat Map](docs/screenshots/web-threat-map.png)
+
+## Quick Start
+
+Prerequisites:
+
+- Node.js 18+
+- pnpm
+- Chrome or Edge
+
+Install dependencies:
+
+```bash
+pnpm install:all
+```
+
+Start backend:
+
+```bash
+pnpm backend:dev
+```
+
+Start web:
+
+```bash
+pnpm web:dev
+```
+
+Build extension:
+
+```bash
+pnpm extension:build
+```
+
+Load extension:
+
+1. Open `chrome://extensions/`
+2. Enable Developer Mode
+3. Click `Load unpacked`
+4. Select `extension/dist`
+
+## Environment
+
+Backend:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+Contracts:
+
+```bash
+cp contracts/.env.example contracts/.env
+```
+
+Web:
+
+```bash
+cp web/.env.example web/.env
+```
+
+Set `VITE_API_BASE_URL` to `http://localhost:3001/api/v1` for local demo.
+
+## Scripts
+
+- `pnpm backend:dev`
+- `pnpm web:dev`
+- `pnpm extension:build`
+- `pnpm demo:start`
+- `pnpm demo:check`
+
+## Notes
+
+- The current MVP protects users at browsing time, including phishing links opened from email, SMS, and social engineering channels.
+- The manual Email Risk Analyzer is designed for pasted suspicious messages. It is not a Gmail or Outlook inbox integration.
+- Blockchain remains part of the architecture and roadmap, but the live demo does not depend on a full on-chain flow.
+
+## License
+
+MIT. See `LICENSE`.

@@ -42,6 +42,7 @@ const verifiedDomains = {
   'microsoft.com': { entity: 'Microsoft', verified: true, category: 'tech' },
   'apple.com': { entity: 'Apple', verified: true, category: 'tech' },
   'github.com': { entity: 'GitHub', verified: true, category: 'tech' },
+  'devpost.com': { entity: 'Devpost', verified: true, category: 'tech' },
   'stackoverflow.com': { entity: 'Stack Overflow', verified: true, category: 'tech' },
   
   // Cryptocurrency
