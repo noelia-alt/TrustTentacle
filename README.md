@@ -167,4 +167,4 @@ Set `VITE_API_BASE_URL` to `http://localhost:3001/api/v1` for local demo.
 
 ## License
 
-MIT. See `LICENSE`.
+This project is licensed under the [MIT License](LICENSE).
