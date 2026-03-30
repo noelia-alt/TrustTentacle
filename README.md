@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>  <strong>Octopus Hackathon 2025</strong> | Stage 2 finalist | Top 50 out of 900+ projects
+  <strong>Octopus Hackathon 2025</strong> | Stage 2 finalist | Top 50 out of 900+ projects
 </p>
 
 ## Problem
@@ -76,7 +76,11 @@ Danger verdict:
 
 ![Extension Popup Danger](docs/screenshots/extension-popup-danger.png)
 
-### Web Dashboard
+### Web Experience
+
+Home:
+
+![Web Home](docs/screenshots/home.png)
 
 Dashboard overview:
 
@@ -168,3 +172,5 @@ Set `VITE_API_BASE_URL` to `http://localhost:3001/api/v1` for local demo.
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+
